@@ -1,0 +1,2 @@
+class ImageProcessingError(Exception):
+    pass
