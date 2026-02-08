@@ -84,7 +84,7 @@ async def get_detail(id: UUID, db: AsyncSession=Depends(get_db)):
 @router.post("/cards", response_model=DetailOut, status_code=status.HTTP_201_CREATED)
 async def add_card(
     title: str = Form(...),
-    description: str = Form(...),
+    description: Optional[str] = Form(None),
     difficulty: Difficulty = Form(...),
     completed: bool = Form(...),
     tag_names: list[str] = Form([]),

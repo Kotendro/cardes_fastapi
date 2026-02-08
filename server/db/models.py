@@ -14,7 +14,7 @@ class Card(Base):
     
     id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid4)
     title: Mapped[str] = mapped_column(String(100), nullable=False)
-    description: Mapped[str] = mapped_column(Text)
+    description: Mapped[str] = mapped_column(Text, nullable=True)
     difficulty: Mapped[Difficulty] = mapped_column(
         Enum(Difficulty, name="difficulty_enum"),
         nullable=False
