@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <header>
+        <button id="btn">Add card</button>
+    </header>
+
+    <section>
+
+    </section>
+
+    <dialog id="cardDialog">
+        <form id="cardForm" novalidate>
+            <div>
+                <label for="title">* Title</label>
+                <input id="title" name="title" type="text" required>
+                <div id="titleError" aria-live="polite"></div>
+            </div>
+
+            <div>
+                <label for="description">Description</label>
+                <textarea id="description" name="description"></textarea>
+            </div>
+
+            <div>
+                <label for="difficulty">Difficulty</label>
+                <select id="difficulty" name="difficulty">
+                    <option value="easy">easy</option>
+                    <option value="medium">medium</option>
+                    <option value="hard">hard</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="completed">Completed</label>
+                <input id="completed" name="completed" type="checkbox">
+            </div>
+
+            <fieldset id="tagsField">
+                <legend>Tags</legend>
+
+                <div id="chips"></div>
+
+                <input type="text" id="tagEditor" hidden>
+                <div id="tagEditorError" aria-live="polite"></div>
+                <button type="button" id="addTag">+</button>
+            </fieldset>
+
+            <div>
+                <button type="submit">submit</button>
+            </div>
+
+            <div>
+                <input id="image" name="image" type="file" accept="image/jpeg, image/png" hidden required>
+            </div>
+        </form>
+
+        <!-- image preview -->
+        <aside>
+            <label for="image">
+                <div>
+                    <img id="previewImage" alt="preview">
+                </div>
+            </label>
+
+            <div id="imageError" aria-live="polite"></div>
+        </aside>
+    </dialog>
+
+</body>
+
+<script type="module" src="./js/app.js"></script>
+
+</html>
