@@ -7,29 +7,30 @@
 
 <body>
     <header>
-        <button id="btn">Add card</button>
+        <button id="addCardBtn">Add card</button>
+        <button id="editCardBtn">Edit card</button>
     </header>
 
-    <section>
+    <section id="cardSection">
 
     </section>
 
-    <dialog id="cardDialog">
+    <dialog id="cardFormDialog">
         <form id="cardForm" novalidate>
             <div>
-                <label for="title">* Title</label>
-                <input id="title" name="title" type="text" required>
-                <div id="titleError" aria-live="polite"></div>
+                <label for="titleFormInput">* Title</label>
+                <input id="titleFormInput" name="title" type="text" required>
+                <div id="titleFormError" aria-live="polite"></div>
             </div>
 
             <div>
-                <label for="description">Description</label>
-                <textarea id="description" name="description"></textarea>
+                <label for="descriptionFormInput">Description</label>
+                <textarea id="descriptionFormInput" name="description"></textarea>
             </div>
 
             <div>
-                <label for="difficulty">Difficulty</label>
-                <select id="difficulty" name="difficulty">
+                <label for="difficultyFormInput">Difficulty</label>
+                <select id="difficultyFormInput" name="difficulty">
                     <option value="easy">easy</option>
                     <option value="medium">medium</option>
                     <option value="hard">hard</option>
@@ -37,18 +38,18 @@
             </div>
 
             <div>
-                <label for="completed">Completed</label>
-                <input id="completed" name="completed" type="checkbox">
+                <label for="completedFormInput">Completed</label>
+                <input id="completedFormInput" name="completed" type="checkbox">
             </div>
 
-            <fieldset id="tagsField">
+            <fieldset id="tagsFormField">
                 <legend>Tags</legend>
 
-                <div id="chips"></div>
+                <div id="chipsContainer"></div>
 
-                <input type="text" id="tagEditor" hidden>
-                <div id="tagEditorError" aria-live="polite"></div>
-                <button type="button" id="addTag">+</button>
+                <input type="text" id="tagFormEditor" hidden>
+                <div id="tagFormEditorError" aria-live="polite"></div>
+                <button type="button" id="addFormTag">+</button>
             </fieldset>
 
             <div>
@@ -56,19 +57,19 @@
             </div>
 
             <div>
-                <input id="image" name="image" type="file" accept="image/jpeg, image/png" hidden required>
+                <input id="imageFormInput" name="image" type="file" accept="image/jpeg, image/png" hidden>
             </div>
         </form>
 
         <!-- image preview -->
         <aside>
-            <label for="image">
+            <label for="imageFormInput">
                 <div>
-                    <img id="previewImage" alt="preview">
+                    <img id="imageFormPreview" alt="preview">
                 </div>
             </label>
 
-            <div id="imageError" aria-live="polite"></div>
+            <div id="imageFormError" aria-live="polite"></div>
         </aside>
     </dialog>
 
