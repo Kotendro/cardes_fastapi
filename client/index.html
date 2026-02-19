@@ -1,8 +1,11 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 </head>
 
 <body>
@@ -15,66 +18,129 @@
 
     </section>
 
-    <dialog id="cardFormDialog">
-        <form id="cardForm" novalidate>
-            <div>
-                <label for="titleFormInput">* Title</label>
-                <input id="titleFormInput" name="title" type="text" required>
-                <div id="titleFormError" aria-live="polite"></div>
-            </div>
+    <dialog id="cardFormDialog" class="rounded">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                <form id="cardForm" novalidate>
+                    <!-- Title -->
+                    <div class="mb-2">
+                        <input id="titleFormInput" class="form-control" name="title" type="text" placeholder="*Title" required>
+                        <div id="titleFormError" class="invalid-feedback d-block" aria-live="polite"></div>
+                    </div>
 
-            <div>
-                <label for="descriptionFormInput">Description</label>
-                <textarea id="descriptionFormInput" name="description"></textarea>
-            </div>
+                    <!-- description -->
+                    <div class="mb-2">
+                        <textarea id="descriptionFormInput" class="form-control overflow-auto" rows="5" placeholder="Description" style="resize: none;" name="description"></textarea>
+                    </div>
 
-            <div>
-                <label for="difficultyFormInput">Difficulty</label>
-                <select id="difficultyFormInput" name="difficulty">
-                    <option value="easy">easy</option>
-                    <option value="medium">medium</option>
-                    <option value="hard">hard</option>
-                </select>
-            </div>
+                    <!-- difficulty -->
+                    <div class="mb-2 input-group">
+                        <span class="input-group-text" id="basic-addon1">Difficulty</span>
+                        <select id="difficultyFormInput" class="form-select" name="difficulty">
+                            <option value="easy">Easy</option>
+                            <option value="medium">Medium</option>
+                            <option value="hard">Hard</option>
+                        </select>
+                    </div>
 
-            <div>
-                <label for="completedFormInput">Completed</label>
-                <input id="completedFormInput" name="completed" type="checkbox">
-            </div>
+                    <!-- completed -->
+                    <div class="form-check mb-2">
+                        <label for="completedFormInput" class="form-check-label">Completed</label>
+                        <input id="completedFormInput" class="form-check-input" name="completed" type="checkbox">
+                    </div>
 
-            <fieldset id="tagsFormField">
-                <legend>Tags</legend>
+                    <!-- tags -->
+                    <fieldset id="tagsFormField">
+                        <legend>Tags</legend>
 
-                <div id="chipsContainer"></div>
+                        <div id="tagsWrapper" class="d-flex flex-wrap align-items-center" style="max-height:104px; overflow-y:auto;">
 
-                <input type="text" id="tagFormEditor" hidden>
-                <div id="tagFormEditorError" aria-live="polite"></div>
-                <button type="button" id="addFormTag">+</button>
-            </fieldset>
+                            <div id="chipsContainer"></div>
 
-            <div>
-                <button type="submit">submit</button>
-            </div>
+                            <input 
+                                type="text"
+                                id="tagFormEditor"
+                                class="border-0 shadow-none bg-transparent p-0 mb-1 me-1"
+                                placeholder="Add tag..."
+                                style="width:120px;"
+                            >
 
-            <div>
-                <input id="imageFormInput" name="image" type="file" accept="image/jpeg, image/png" hidden>
-            </div>
-        </form>
+                        </div>
 
-        <!-- image preview -->
-        <aside>
-            <label for="imageFormInput">
-                <div>
-                    <img id="imageFormPreview" alt="preview">
+                        <template id="chipTemplate">
+                            <div class="badge bg-secondary d-inline-flex align-items-center mb-1 me-1">
+                                <span></span>
+                                <input type="hidden" name="tag_names">
+                                <button type="button" class="btn-close btn-close-white btn-sm"></button>
+                            </div>
+                        </template>
+                    </fieldset>
+
+
+                    <!-- image -->
+                    <div>
+                        <input id="imageFormInput" name="image" type="file" accept="image/jpeg, image/png" hidden>
+                    </div>
+                </form>
                 </div>
-            </label>
 
-            <div id="imageFormError" aria-live="polite"></div>
-        </aside>
+                <!-- image preview -->
+                <div class="col">
+                <label
+                    for="imageFormInput"
+                    class="d-block w-100 ratio ratio-3x4 border rounded overflow-hidden bg-body-tertiary"
+                >
+                    <img
+                    id="imageFormPreview"
+                    class="w-100 h-100 object-fit-cover d-none"
+                    alt=""
+                    >
+
+                    <div
+                    id="imageFormPlaceholder"
+                    class="d-flex flex-column justify-content-center align-items-center text-body-secondary"
+                    >
+                    <div class="fs-5">Upload</div>
+                    <div class="fs-6">PNG/JPG 3:4</div>
+                    </div>
+                </label>
+
+                <div id="imageFormError" class="invalid-feedback d-block"></div>
+                </div>
+
+            </div>
+
+            <div class="text-end mt-2">
+                <button type="submit"
+                        form="cardForm"
+                        class="btn btn-primary">
+                    Submit
+                </button>
+            </div>
+        </div>
     </dialog>
 
 </body>
 
 <script type="module" src="./js/app.js"></script>
+
+<style>
+dialog {
+  width: 700px;
+}
+
+.ratio-3x4 {
+  --bs-aspect-ratio: 133.333%;
+}
+
+#tagFormEditor:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+#chipsContainer { display: contents; }
+
+</style>
 
 </html>

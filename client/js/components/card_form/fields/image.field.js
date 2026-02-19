@@ -2,6 +2,7 @@ export function initImageField({ dialog, form }) {
   const imageInput = dialog.querySelector("#imageFormInput")
   const previewImage = dialog.querySelector("#imageFormPreview")
   const imageError = dialog.querySelector("#imageFormError")
+  const placeholder = dialog.querySelector("#imageFormPlaceholder")
 
   const FILE_TYPES = ["image/jpeg", "image/png"]
   const REQUIRED_RATIO = { width: 3, height: 4 }
@@ -17,7 +18,7 @@ export function initImageField({ dialog, form }) {
       return
     }
 
-    const {ok, msg} = await fileValidation(file)
+    const { ok, msg } = await fileValidation(file)
     imageError.textContent = msg
 
     if (!ok) {
@@ -29,17 +30,34 @@ export function initImageField({ dialog, form }) {
     setPreview(URL.createObjectURL(file))
   })
 
+  function showPlaceholder() {
+    previewImage.classList.add("d-none")
+    placeholder.classList.remove("d-none")
+  }
+
+  function showImage() {
+    previewImage.classList.remove("d-none")
+    placeholder.classList.add("d-none")
+  }
+
   function restoreDefaultPreview() {
     clearBlobPreview()
-    const initialUrl = previewImage.dataset.initialUrl
-    if (initialUrl) previewImage.src = initialUrl
-    else previewImage.removeAttribute("src")
+    const DefaultUrl = previewImage.dataset.DefaultUrl
+
+    if (DefaultUrl) {
+      previewImage.src = DefaultUrl
+      showImage()
+    } else {
+      previewImage.removeAttribute("src")
+      showPlaceholder()
+    }
   }
 
   function setPreview(objectUrl) {
     clearBlobPreview()
     previewImage.src = objectUrl
     previewImage.dataset.objectUrl = objectUrl
+    showImage()
   }
 
   function clearBlobPreview() {
@@ -98,16 +116,20 @@ export function initImageField({ dialog, form }) {
     mode = _mode
     imageError.textContent = ""
     imageInput.value = ""
+
     clearBlobPreview()
 
     if (DefaultUrl) {
       previewImage.dataset.DefaultUrl = DefaultUrl
       previewImage.src = DefaultUrl
+      showImage()
     } else {
       delete previewImage.dataset.DefaultUrl
       previewImage.removeAttribute("src")
+      showPlaceholder()
     }
   }
+
 
   return { validate, reset }
 }
