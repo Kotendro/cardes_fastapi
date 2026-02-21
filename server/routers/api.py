@@ -170,6 +170,9 @@ async def patch_card(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=str(e),
                 )
+                
+        await db.flush()
+        await db.refresh(item, attribute_names=["updated_at", "tags"])
     
         return DetailOut(
             id=item.id,
