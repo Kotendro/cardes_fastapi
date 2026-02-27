@@ -11,7 +11,7 @@
 <body>
     <header>
         <button id="addCardBtn">Add card</button>
-        <button id="editCardBtn">Edit card</button>
+        <button id="detailCardBtn">Detail card</button>
     </header>
 
     <section id="cardSection">
@@ -26,7 +26,7 @@
                     <!-- Title -->
                     <div class="mb-2">
                         <input id="titleFormInput" class="form-control" name="title" type="text" placeholder="*Title" required>
-                        <div id="titleFormError" class="invalid-feedback d-block" aria-live="polite"></div>
+                        <div id="titleFormError" class="invalid-feedback d-block d-none" aria-live="polite"></div>
                     </div>
 
                     <!-- description -->
@@ -56,7 +56,7 @@
 
                         <div id="tagsWrapper" class="d-flex flex-wrap align-items-center" style="max-height:104px; overflow-y:auto;">
 
-                            <div id="chipsContainer"></div>
+                            <div id="chipsContainerForm"></div>
 
                             <input 
                                 type="text"
@@ -68,7 +68,7 @@
 
                         </div>
 
-                        <template id="chipTemplate">
+                        <template id="chipTemplateForm">
                             <div class="badge bg-secondary d-inline-flex align-items-center mb-1 me-1">
                                 <span></span>
                                 <input type="hidden" name="tag_names">
@@ -111,12 +111,78 @@
 
             </div>
 
-            <div class="text-end mt-2">
-                <button type="submit"
-                        form="cardForm"
-                        class="btn btn-primary">
-                    Submit
-                </button>
+            <div class="mt-2 d-flex justify-content-between" id="formDialogBtns">
+                <div id="leftFormDialogBtns">
+                    <button type="button" id="backBtnForm" class="btn btn-secondary d-none">
+                        Back
+                    </button>
+                </div>
+
+                <div id="rightFormDialogBtns">
+                    <button type="submit" id="submitBtnForm" form="cardForm" class="btn btn-primary">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+
+    <dialog id="cardDetailDialog" class="rounded">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <!-- title / difficulty -->
+                    <div>
+                        <h4 class="text-center">
+                            <span id="titleDetail"></span>
+                            <span id="difficultyDetail" class="fs-6"></span>
+                        </h4>
+                    </div>
+
+                    <!-- tags -->
+                    <div>
+                        <div id="chipsContainerDetail" class="d-flex flex-wrap justify-content-center">
+
+                        </div>
+
+                        <template id="chipTemplateDetail">
+                            <div class="badge bg-secondary d-inline-flex align-items-center mb-1 me-1">
+                                <span></span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div>
+                        <p id="descriptionDetail"></p>
+                    </div>
+
+                </div>
+
+                <div class="col">
+                    <div class="d-block w-100 ratio ratio-3x4 border rounded overflow-hidden bg-body-tertiary">
+                        <img
+                        id="imageDetail"
+                        class="w-100 h-100 object-fit-cover"
+                        alt=""
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-2 d-flex justify-content-between" id="DetailDialogBtns">
+                <div id="leftDetailDialogBtns">
+
+                </div>
+
+                <div id="rightDetailDialogBtns">
+                    <button type="button" id="completeBtnDetail" class="btn btn-primary">
+                        Toggle
+                    </button>
+                    <button type="button" id="editBtnDetail" class="btn btn-primary">
+                        Edit
+                    </button>
+                </div>
             </div>
         </div>
     </dialog>
@@ -132,6 +198,10 @@ dialog {
 
 .ratio-3x4 {
   --bs-aspect-ratio: 133.333%;
+}
+
+.img-grayscale {
+  filter: grayscale(100%);
 }
 
 #tagFormEditor:focus {
