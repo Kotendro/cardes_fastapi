@@ -1,7 +1,7 @@
 export function initTagField({ dialog, form }) {
-    const chipsContainer = dialog.querySelector("#chipsContainer")
+    const chipsContainerForm = dialog.querySelector("#chipsContainerForm")
     const tagEditor = dialog.querySelector("#tagFormEditor")
-    const chipTemplate = dialog.querySelector("#chipTemplate")
+    const chipTemplate = dialog.querySelector("#chipTemplateForm")
 
     const tags = new Set()      
 
@@ -39,13 +39,13 @@ export function initTagField({ dialog, form }) {
             chip.remove()
         })
 
-        chipsContainer.appendChild(chip)
+        chipsContainerForm.appendChild(chip)
     }
 
     
     function reset(tags_input = []) {
         tags.clear()
-        chipsContainer.replaceChildren()
+        chipsContainerForm.replaceChildren()
 
         for (const tag of tags_input) {
             tags.add(tag)

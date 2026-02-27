@@ -3,14 +3,57 @@ import { initImageField } from "/js/components/card_form/fields/image.field.js"
 import { initTagField } from "/js/components/card_form/fields/tag.field.js"
 import { addCard, patchCard, get_big_image_url } from "/js/service/api.js"
 import { buildPatch, buildPost, fillForm } from "/js/components/card_form/card_form.mapper.js"
+import { update_buttons } from "/js/components/card_form/card_form.render.js"
 
-export function initCardForm({ dialog, form }) {
+export function initCardForm({ dialog, form, store }) {
     const titleField = initTitleField({ dialog, form })
     const imageField = initImageField({ dialog, form })
     const tagField = initTagField({ dialog, form })
+    const backBtnForm = dialog.querySelector("#backBtnForm")
+    const submitBtnForm = dialog.querySelector("#submitBtnForm")
 
-    let mode = "create"
-    let editingCardDetailed = null
+    function open() {
+        dialog.showModal()
+    }
+
+    function close() {
+        dialog.close()
+    }
+
+    function renderCreate() {
+        update_buttons({ mode: "create", submitBtnForm, backBtnForm })
+
+        form.reset()
+        imageField.reset({ _mode: "create", DefaultUrl: null })
+        tagField.reset()
+        titleField.reset()
+    }
+
+    function renderEdit(card) {
+        update_buttons({ mode: "edit", submitBtnForm, backBtnForm })
+
+        fillForm({ form, cardDetailed: card })
+        const url = get_big_image_url({ card, cache: false })
+        imageField.reset({ _mode: "edit", DefaultUrl: url })
+        tagField.reset(card.tags)
+        titleField.reset()
+    }
+
+    function render(state) {
+        if (state.formMode === "create") {
+            renderCreate()
+            return
+        }
+
+        if (state.formMode === "edit") {
+            renderEdit(state.currentCard)
+            return
+        }
+    }
+
+    backBtnForm.addEventListener("click", () => {
+        store.setState({screen: "detail" })
+    })
 
     form.addEventListener("submit", async (e) => {
         e.preventDefault()
@@ -20,55 +63,35 @@ export function initCardForm({ dialog, form }) {
 
         if (!okTitle) return
         if (!okImage) return
+
+        const { formMode, currentCard } = store.getState()
         
-        if (mode === "create") {
-            const formData = buildPost({
-                form,
-            })
+        if (formMode === "create") {
+            const formData = buildPost({ form })
             const data = await addCard(formData)
-            dialog.close()
+
+            store.setState({
+                screen: "list",
+                currentCard: data,
+            })
             return
         }
 
-        if (mode === "edit") {
-            const formData = buildPatch({
-                form,
-                cardDetailed: editingCardDetailed,
-            })
+        if (formMode === "edit") {
+            const formData = buildPatch({ form, cardDetailed: currentCard })
+            const data = await patchCard(currentCard.id, formData)
 
-            const data = await patchCard(editingCardDetailed.id, formData)
-            dialog.close()
+            store.setState({
+                screen: "list",
+                currentCard: data,
+            })
             return
         }
     })
 
-    function openCreate() {
-        mode = "create"
-        editingCardDetailed = null
-
-        form.reset()
-        imageField.reset({ _mode: "create", DefaultUrl: null })
-        tagField.reset()
-        titleField.reset()
-        dialog.showModal()
-    }
-
-    function openEdit(cardDetailed) {
-        mode = "edit"
-        editingCardDetailed = cardDetailed
-
-        fillForm({ form, cardDetailed })
-        const url = get_big_image_url({card:editingCardDetailed, cache:false})
-        imageField.reset({ _mode: "edit", DefaultUrl: url })
-        tagField.reset(cardDetailed.tags)
-        titleField.reset()
-        
-
-        dialog.showModal()
-    }
-
     return {
-        openCreate,
-        openEdit
+        open,
+        close,
+        render,
     }
 }

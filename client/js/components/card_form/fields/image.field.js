@@ -14,12 +14,12 @@ export function initImageField({ dialog, form }) {
 
     if (!file) {
       restoreDefaultPreview()
-      imageError.textContent = ""
+      toggleError()
       return
     }
 
     const { ok, msg } = await fileValidation(file)
-    imageError.textContent = msg
+    toggleError(msg)
 
     if (!ok) {
       imageInput.value = ""
@@ -38,6 +38,11 @@ export function initImageField({ dialog, form }) {
   function showImage() {
     previewImage.classList.remove("d-none")
     placeholder.classList.add("d-none")
+  }
+
+  function toggleError(msg="") {
+    imageError.classList.toggle("d-none", !msg)
+    imageError.textContent = msg || ""
   }
 
   function restoreDefaultPreview() {
@@ -68,7 +73,7 @@ export function initImageField({ dialog, form }) {
 
   async function validate() {
     const { ok, msg } = await submitValidation()
-    imageError.textContent = msg
+    toggleError(msg)
     return ok
   }
 
@@ -114,7 +119,7 @@ export function initImageField({ dialog, form }) {
 
   function reset({ _mode, DefaultUrl }) {
     mode = _mode
-    imageError.textContent = ""
+    toggleError()
     imageInput.value = ""
 
     clearBlobPreview()
