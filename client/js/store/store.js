@@ -1,3 +1,9 @@
+// screen:
+// formMode:
+// currentId:
+// shortById: 
+// detailById: 
+
 export function createStore(initialState) {
     let state = initialState
     const listeners = []
@@ -6,8 +12,13 @@ export function createStore(initialState) {
         getState() {
             return state
         },
-        setState(patch) {
-            state = { ...state, ...patch }
+        setState(update) {
+            if (typeof update === "function") {
+                state = update(state)
+            } 
+            else {
+                state = { ...state, ...update }
+            }
             listeners.forEach(fn => fn(state))
         },
         subscribe(fn) {

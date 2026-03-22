@@ -4,6 +4,8 @@ import { initTagField } from "/js/components/card_form/fields/tag.field.js"
 import { addCard, patchCard, get_big_image_url } from "/js/service/api.js"
 import { buildPatch, buildPost, fillForm } from "/js/components/card_form/card_form.mapper.js"
 import { update_buttons } from "/js/components/card_form/card_form.render.js"
+import { selectCurrentDetail } from "/js/store/state.utils.js"
+import { upsertCard } from "/js/store/store.utils.js"
 
 export function initCardForm({ dialog, form, store }) {
     const titleField = initTitleField({ dialog, form })
@@ -12,31 +14,21 @@ export function initCardForm({ dialog, form, store }) {
     const backBtnForm = dialog.querySelector("#backBtnForm")
     const submitBtnForm = dialog.querySelector("#submitBtnForm")
 
+    store.subscribe((state) => {
+        if (state.screen !== "form") {
+            close()
+            return
+        }
+        open()
+        render(state)
+    })
+
     function open() {
-        dialog.showModal()
+        if (!dialog.open) dialog.showModal()
     }
 
     function close() {
-        dialog.close()
-    }
-
-    function renderCreate() {
-        update_buttons({ mode: "create", submitBtnForm, backBtnForm })
-
-        form.reset()
-        imageField.reset({ _mode: "create", DefaultUrl: null })
-        tagField.reset()
-        titleField.reset()
-    }
-
-    function renderEdit(card) {
-        update_buttons({ mode: "edit", submitBtnForm, backBtnForm })
-
-        fillForm({ form, cardDetailed: card })
-        const url = get_big_image_url({ card, cache: false })
-        imageField.reset({ _mode: "edit", DefaultUrl: url })
-        tagField.reset(card.tags)
-        titleField.reset()
+        if (dialog.open) dialog.close()
     }
 
     function render(state) {
@@ -46,9 +38,29 @@ export function initCardForm({ dialog, form, store }) {
         }
 
         if (state.formMode === "edit") {
-            renderEdit(state.currentCard)
+            const currnetCard = selectCurrentDetail(state)
+            renderEdit(currnetCard)
             return
         }
+    }
+    
+    function renderCreate() {
+        update_buttons({ mode: "create", submitBtnForm, backBtnForm })
+
+        form.reset()
+        imageField.reset({ _mode: "create", DefaultUrl: null })
+        tagField.reset()
+        titleField.reset()
+    }
+
+    function renderEdit(detail) {
+        update_buttons({ mode: "edit", submitBtnForm, backBtnForm })
+
+        fillForm({ form, cardDetailed: detail })
+        const url = get_big_image_url({ card: detail, cache: false })
+        imageField.reset({ _mode: "edit", DefaultUrl: url })
+        tagField.reset(detail.tags)
+        titleField.reset()
     }
 
     backBtnForm.addEventListener("click", () => {
@@ -64,27 +76,29 @@ export function initCardForm({ dialog, form, store }) {
         if (!okTitle) return
         if (!okImage) return
 
-        const { formMode, currentCard } = store.getState()
+        const state = store.getState()
         
-        if (formMode === "create") {
+        if (state.formMode === "create") {
             const formData = buildPost({ form })
-            const data = await addCard(formData)
+            const created = await addCard(formData)
 
-            store.setState({
-                screen: "list",
-                currentCard: data,
-            })
+            store.setState(state => ({
+            ...upsertCard(state, created),
+            screen: "list",
+            }))
             return
         }
 
-        if (formMode === "edit") {
-            const formData = buildPatch({ form, cardDetailed: currentCard })
-            const data = await patchCard(currentCard.id, formData)
+        if (state.formMode === "edit") {
+            const currentCard = selectCurrentDetail(state)
 
-            store.setState({
+            const formData = buildPatch({ form, cardDetailed: currentCard })
+            const patched = await patchCard(currentCard.id, formData)
+
+            store.setState(state => ({
+                ...upsertCard(state, patched),
                 screen: "list",
-                currentCard: data,
-            })
+            }))
             return
         }
     })

@@ -14,8 +14,16 @@ export function get_thumbnail_url({card, cache=true}) {
     return `http://127.0.0.1:8000/static/cards/${card.id}/thumb.jpg`
 }
 
-export async function getPage() {
-    const url = "http://127.0.0.1:8000/api/v1/cards"
+export async function getPage({ page, limit } = {}) {
+    
+    const baseUrl = "http://127.0.0.1:8000/api/v1/cards"
+    const urlObj = new URL(baseUrl)
+
+    if (page !== undefined) urlObj.searchParams.set("page", page)
+    if (limit !== undefined) urlObj.searchParams.set("limit", limit)
+    
+
+    const url = urlObj.toString()
     const method = "GET"
     const key = makeKey(url, method)
 

@@ -21,7 +21,7 @@ class DetailOut(BaseModel):
     """All required information of card."""
     id: UUID
     title: str
-    description: str
+    description: str | None
     difficulty: Difficulty
     completed: bool
     created_at: datetime

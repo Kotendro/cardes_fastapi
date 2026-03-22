@@ -1,18 +1,24 @@
-import { getDetail } from "/js/service/api.js"
+import { getPage, getDetail } from "/js/service/api.js"
 import { initCardForm } from "/js/components/card_form/card_form.controller.js"
 import { initCardDetail } from "/js/components/card_detail/card_detail.contoller.js"
-import { createStore } from "/js/store.js"
+import { initCardCatalog } from "/js/cards/cards.controller.js"
+import { createStore } from "/js/store/store.js"
+import { normalizeById } from "/js/service/api.utils.js"
 
 const cardFormDialog = document.querySelector("#cardFormDialog")
 const cardDetailDialog = document.querySelector("#cardDetailDialog")
+const cardSection = document.querySelector("#cardSection")
 const cardForm = document.querySelector("#cardForm")
 const addCardBtn = document.querySelector("#addCardBtn")
-const detailCardBtn = document.querySelector("#detailCardBtn")
+
 
 const store = createStore({
     screen: "list",
-    currentCard: null,
-    formMode: "create"
+    formMode: "create",
+
+    currentId: null,
+    shortById: {},
+    detailById: {},
 })
 
 const cardFormApi = initCardForm({
@@ -26,34 +32,22 @@ const cardDetailApi =  initCardDetail({
     store: store
 })
 
-store.subscribe((state) => {
-    if (state.screen === "form") {
-        cardDetailApi.close()
-        cardFormApi.open()
-        cardFormApi.render(state)
-        return
-    }
-
-    if (state.screen === "detail") {
-        cardFormApi.close()
-        cardDetailApi.open()
-        cardDetailApi.render(state)
-        return
-    }
-
-    cardFormApi.close()
-    cardDetailApi.close()
+const cardCatalogApi = initCardCatalog({
+    cardSection: cardSection,
+    store: store,
 })
 
 
-const card = await getDetail("f8642195-8d20-4a2a-a6e2-8f437641891b")
-store.setState({currentCard: card})
-console.log(card)
+const { items, total } = await getPage({
+    page: 1,
+    limit: 20,
+})
 
+const normalize = normalizeById(items)
+
+store.setState({ shortById: normalize })
+
+console.log(addCardBtn)
 addCardBtn.addEventListener("click", () => {
     store.setState({ screen:"form", formMode:"create" })
-})
-
-detailCardBtn.addEventListener("click", () => {
-    store.setState({ screen:"detail" })
 })

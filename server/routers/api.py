@@ -29,7 +29,7 @@ from utils.image_methods import del_images, save_images
 router = APIRouter()
 
 @router.get("/cards", response_model=ListShortOut)
-async def get_page(db: AsyncSession=Depends(get_db)):
+async def get_page(page: int = 0, limit: int = 20, db: AsyncSession=Depends(get_db)):
     """
     Minimum required information.
     Sorting. Filters.
@@ -38,7 +38,9 @@ async def get_page(db: AsyncSession=Depends(get_db)):
     stmt = (
         select(Card)
         .options(selectinload(Card.tags))
-        .limit(20)
+        .offset(page * limit)
+        .limit(limit)
+        .order_by(Card.created_at)
     )
     res = (await db.execute(stmt)).scalars().all()
     

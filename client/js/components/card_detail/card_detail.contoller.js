@@ -6,6 +6,8 @@ import {
     image_render,
 } from "/js/components/card_detail/card_detail.render.js"
 import { patchCard } from "/js/service/api.js"
+import { selectCurrentDetail } from "/js/store/state.utils.js"
+import { upsertCard } from "/js/store/store.utils.js"
 
 export function initCardDetail({ dialog, store }) {
     const titleDetail = dialog.querySelector("#titleDetail")
@@ -17,16 +19,25 @@ export function initCardDetail({ dialog, store }) {
     const editBtnDetail = dialog.querySelector("#editBtnDetail")
     const completeBtnDetail = dialog.querySelector("#completeBtnDetail")
 
+    store.subscribe((state) => {
+        if (state.screen !== "detail") {
+            close()
+            return
+        }
+        open()
+        render(state)
+    })
+
     function open() {
-        dialog.showModal()
+        if (!dialog.open) dialog.showModal()
     }
 
     function close() {
-        dialog.close()
+        if (dialog.open) dialog.close()
     }
 
     function render(state) {
-        const card = state.currentCard
+        const card = selectCurrentDetail(state)
 
         detail_reset({
             difficultyDetail: difficultyDetail,
@@ -60,24 +71,32 @@ export function initCardDetail({ dialog, store }) {
     })
 
     completeBtnDetail.addEventListener("click", async () => {
-        const s = store.getState()
-        if (!s.currentCard) return
+        const state0 = store.getState()
+        const id = state0.currentId
+        if (!id) return
 
-        const prev = s.currentCard
-        const newCompleted = !prev.completed
+        const prev = selectCurrentDetail(state0)
+        if (!prev) return
 
-        store.setState({
-            currentCard: { ...prev, completed: newCompleted }
+        const nextCompleted = !prev.completed
+
+        // 1) optimistic update (и shortById, и detailById обновятся через upsertCard)
+        store.setState(state => {
+            const cur = state.detailById[id]
+            if (!cur) return state
+            return upsertCard(state, { ...cur, completed: nextCompleted })
         })
 
         const formData = new FormData()
-        formData.set("completed", newCompleted ? "true" : "false")
+        formData.set("completed", nextCompleted ? "true" : "false")
 
         try {
-            const fresh = await patchCard(prev.id, formData)
-            store.setState({ currentCard: fresh })
+            // 2) сервер прислал "истину" — кладём её в byId
+            const fresh = await patchCard(id, formData)
+            store.setState(state => upsertCard(state, fresh))
         } catch (err) {
-            store.setState({ currentCard: prev })
+            // 3) ошибка — откатываем обратно prev
+            store.setState(state => upsertCard(state, prev))
         }
     })
 
