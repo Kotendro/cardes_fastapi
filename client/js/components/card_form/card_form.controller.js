@@ -1,7 +1,7 @@
 import { initTitleField } from "/js/components/card_form/fields/title.field.js"
 import { initImageField } from "/js/components/card_form/fields/image.field.js"
 import { initTagField } from "/js/components/card_form/fields/tag.field.js"
-import { addCard, patchCard, get_big_image_url, getPage } from "/js/service/api.js"
+import { addCard, patchCard, get_big_image_url, getPage, deleteCard } from "/js/service/api.js"
 import { buildPatch, buildPost, fillForm } from "/js/components/card_form/card_form.mapper.js"
 import { update_buttons } from "/js/components/card_form/card_form.render.js"
 import { selectCurrentCard } from "/js/store/state.utils.js"
@@ -13,6 +13,7 @@ export function initCardForm({ dialog, form, store }) {
     const tagField = initTagField({ dialog, form })
     const backBtnForm = dialog.querySelector("#backBtnForm")
     const submitBtnForm = dialog.querySelector("#submitBtnForm")
+    const deleteBtnForm = dialog.querySelector("#deleteBtnForm")
 
     store.subscribe((state) => {
         if (state.screen !== "form") {
@@ -45,7 +46,7 @@ export function initCardForm({ dialog, form, store }) {
     }
     
     function renderCreate() {
-        update_buttons({ mode: "create", submitBtnForm, backBtnForm })
+        update_buttons({ mode: "create", submitBtnForm, backBtnForm, deleteBtnForm })
 
         form.reset()
         imageField.reset({ _mode: "create", DefaultUrl: null })
@@ -54,7 +55,7 @@ export function initCardForm({ dialog, form, store }) {
     }
 
     function renderEdit(detail) {
-        update_buttons({ mode: "edit", submitBtnForm, backBtnForm })
+        update_buttons({ mode: "edit", submitBtnForm, backBtnForm, deleteBtnForm })
 
         fillForm({ form, cardDetailed: detail })
         const url = get_big_image_url({ card: detail, cache: false })
@@ -65,6 +66,27 @@ export function initCardForm({ dialog, form, store }) {
 
     backBtnForm.addEventListener("click", () => {
         store.setState({screen: "detail" })
+    })
+
+    deleteBtnForm.addEventListener("click", async () => {
+        if (confirm("Are you sure you want to delete this card?")) {
+            const state = store.getState()
+            const card = selectCurrentCard(state)
+
+            await deleteCard(card.id)
+
+            const { items, total } = await getPage({
+                page: state.page,
+                limit: state.limit,
+            })
+            const normalize = normalizeById(items)
+
+            store.setState({
+                screen: "list",
+                cardsById: normalize,
+                total: total,
+            })
+        }
     })
 
     form.addEventListener("submit", async (e) => {
