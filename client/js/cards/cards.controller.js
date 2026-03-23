@@ -1,5 +1,4 @@
 import { get_thumbnail_url, getDetail, getPage } from "/js/service/api.js"
-import { upsertCard } from "/js/store/store.utils.js"
 
 export function initCardCatalog({ cardSection, store }) {
     const cardContainer = cardSection.querySelector("#cardContainer")
@@ -8,12 +7,11 @@ export function initCardCatalog({ cardSection, store }) {
 
     store.subscribe((state) => {
         cardRow.replaceChildren()
-        console.log("render catalog")
         render(state)
     })
 
     function render(state) {
-        const cards = Object.values(state.shortById)
+        const cards = Object.values(state.cardsById)
 
         for (const card of cards) {
             const cardEl = cardTemplate.content.firstElementChild.cloneNode(true)
@@ -36,11 +34,10 @@ export function initCardCatalog({ cardSection, store }) {
         const id = cardEl.dataset.cardId
         const detail = await getDetail(id)
 
-        store.setState(state => ({
-            ...upsertCard(state, detail),
+        store.setState({
             screen: "detail",
             currentId: detail.id,
-        }))
+        })
     })
 
     return {

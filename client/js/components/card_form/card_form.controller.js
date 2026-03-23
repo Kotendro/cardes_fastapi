@@ -1,11 +1,11 @@
 import { initTitleField } from "/js/components/card_form/fields/title.field.js"
 import { initImageField } from "/js/components/card_form/fields/image.field.js"
 import { initTagField } from "/js/components/card_form/fields/tag.field.js"
-import { addCard, patchCard, get_big_image_url } from "/js/service/api.js"
+import { addCard, patchCard, get_big_image_url, getPage } from "/js/service/api.js"
 import { buildPatch, buildPost, fillForm } from "/js/components/card_form/card_form.mapper.js"
 import { update_buttons } from "/js/components/card_form/card_form.render.js"
-import { selectCurrentDetail } from "/js/store/state.utils.js"
-import { upsertCard } from "/js/store/store.utils.js"
+import { selectCurrentCard } from "/js/store/state.utils.js"
+import { normalizeById } from "/js/service/api.utils.js"
 
 export function initCardForm({ dialog, form, store }) {
     const titleField = initTitleField({ dialog, form })
@@ -38,7 +38,7 @@ export function initCardForm({ dialog, form, store }) {
         }
 
         if (state.formMode === "edit") {
-            const currnetCard = selectCurrentDetail(state)
+            const currnetCard = selectCurrentCard(state)
             renderEdit(currnetCard)
             return
         }
@@ -80,25 +80,38 @@ export function initCardForm({ dialog, form, store }) {
         
         if (state.formMode === "create") {
             const formData = buildPost({ form })
-            const created = await addCard(formData)
+            await addCard(formData)
 
-            store.setState(state => ({
-            ...upsertCard(state, created),
-            screen: "list",
-            }))
+            const { items, total } = await getPage({
+                page: state.page,
+                limit: state.limit,
+            })
+            const normalize = normalizeById(items)
+
+            store.setState({
+                ...state,
+                screen: "list",
+                cardsById: normalize,
+            })
             return
         }
 
         if (state.formMode === "edit") {
-            const currentCard = selectCurrentDetail(state)
-
+            const currentCard = selectCurrentCard(state)
             const formData = buildPatch({ form, cardDetailed: currentCard })
-            const patched = await patchCard(currentCard.id, formData)
+            await patchCard(currentCard.id, formData)
 
-            store.setState(state => ({
-                ...upsertCard(state, patched),
+            const { items, total } = await getPage({
+                page: state.page,
+                limit: state.limit,
+            })
+            const normalize = normalizeById(items)
+
+            store.setState({
+                ...state,
                 screen: "list",
-            }))
+                cardsById: normalize,
+            })
             return
         }
     })

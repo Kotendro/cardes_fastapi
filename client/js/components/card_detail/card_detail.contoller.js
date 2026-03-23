@@ -5,9 +5,10 @@ import {
     completed_render,
     image_render,
 } from "/js/components/card_detail/card_detail.render.js"
-import { patchCard } from "/js/service/api.js"
-import { selectCurrentDetail } from "/js/store/state.utils.js"
-import { upsertCard } from "/js/store/store.utils.js"
+import { patchCard, getPage } from "/js/service/api.js"
+import { selectCurrentCard } from "/js/store/state.utils.js"
+import { normalizeById } from "/js/service/api.utils.js"
+
 
 export function initCardDetail({ dialog, store }) {
     const titleDetail = dialog.querySelector("#titleDetail")
@@ -37,7 +38,7 @@ export function initCardDetail({ dialog, store }) {
     }
 
     function render(state) {
-        const card = selectCurrentDetail(state)
+        const card = selectCurrentCard(state)
 
         detail_reset({
             difficultyDetail: difficultyDetail,
@@ -75,28 +76,30 @@ export function initCardDetail({ dialog, store }) {
         const id = state0.currentId
         if (!id) return
 
-        const prev = selectCurrentDetail(state0)
+        const prev = selectCurrentCard(state0)
         if (!prev) return
 
         const nextCompleted = !prev.completed
-
-        // 1) optimistic update (и shortById, и detailById обновятся через upsertCard)
-        store.setState(state => {
-            const cur = state.detailById[id]
-            if (!cur) return state
-            return upsertCard(state, { ...cur, completed: nextCompleted })
-        })
 
         const formData = new FormData()
         formData.set("completed", nextCompleted ? "true" : "false")
 
         try {
-            // 2) сервер прислал "истину" — кладём её в byId
-            const fresh = await patchCard(id, formData)
-            store.setState(state => upsertCard(state, fresh))
+            await patchCard(id, formData)
+
+            const state1 = store.getState()
+            const { items, total } = await getPage({
+                page: state1.page,
+                limit: state1.limit,
+            })
+            const normalize = normalizeById(items)
+
+            store.setState({
+                ...state1,
+                cardsById: normalize
+            })
         } catch (err) {
-            // 3) ошибка — откатываем обратно prev
-            store.setState(state => upsertCard(state, prev))
+            console.error(err)
         }
     })
 

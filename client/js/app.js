@@ -17,8 +17,10 @@ const store = createStore({
     formMode: "create",
 
     currentId: null,
-    shortById: {},
-    detailById: {},
+    cardsById: {},
+
+    page: 0,
+    limit: 10,
 })
 
 const cardFormApi = initCardForm({
@@ -37,17 +39,15 @@ const cardCatalogApi = initCardCatalog({
     store: store,
 })
 
+const {page, limit} = store.getState()
 
 const { items, total } = await getPage({
-    page: 1,
-    limit: 20,
+    page: page,
+    limit: limit,
 })
-
 const normalize = normalizeById(items)
+store.setState({ cardsById: normalize })
 
-store.setState({ shortById: normalize })
-
-console.log(addCardBtn)
 addCardBtn.addEventListener("click", () => {
     store.setState({ screen:"form", formMode:"create" })
 })

@@ -2,22 +2,8 @@ from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel
 from core.types import Difficulty
-
-class ShortOut(BaseModel):
-    """Minimum required information of card."""
-    id: UUID
-    title: str
-    difficulty: Difficulty
-    completed: bool
-    tags: list[str]
     
-class ListShortOut(BaseModel):
-    items: list[ShortOut]
-    total: int
-    
-    model_config = {"from_attributes": True}
-    
-class DetailOut(BaseModel):
+class CardOut(BaseModel):
     """All required information of card."""
     id: UUID
     title: str
@@ -27,5 +13,11 @@ class DetailOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     tags: list[str]
+    
+    model_config = {"from_attributes": True}
+    
+class ListCardOut(BaseModel):
+    items: list[CardOut]
+    total: int
     
     model_config = {"from_attributes": True}

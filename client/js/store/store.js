@@ -1,8 +1,7 @@
 // screen:
 // formMode:
 // currentId:
-// shortById: 
-// detailById: 
+// cardsById: 
 
 export function createStore(initialState) {
     let state = initialState
@@ -13,12 +12,7 @@ export function createStore(initialState) {
             return state
         },
         setState(update) {
-            if (typeof update === "function") {
-                state = update(state)
-            } 
-            else {
-                state = { ...state, ...update }
-            }
+            state = { ...state, ...update }
             listeners.forEach(fn => fn(state))
         },
         subscribe(fn) {

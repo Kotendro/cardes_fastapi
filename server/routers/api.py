@@ -15,9 +15,8 @@ from fastapi import (
 )
 from db.session import get_db
 from schemas.cards import (
-    ListShortOut,
-    DetailOut,
-    ShortOut,
+    CardOut,
+    ListCardOut
 )
 from db.models import Card
 from core.types import Difficulty
@@ -28,7 +27,7 @@ from utils.image_methods import del_images, save_images
 
 router = APIRouter()
 
-@router.get("/cards", response_model=ListShortOut)
+@router.get("/cards", response_model=ListCardOut)
 async def get_page(page: int = 0, limit: int = 20, db: AsyncSession=Depends(get_db)):
     """
     Minimum required information.
@@ -40,26 +39,29 @@ async def get_page(page: int = 0, limit: int = 20, db: AsyncSession=Depends(get_
         .options(selectinload(Card.tags))
         .offset(page * limit)
         .limit(limit)
-        .order_by(Card.created_at)
+        .order_by(Card.created_at.desc())
     )
     res = (await db.execute(stmt)).scalars().all()
     
     items = []
     for r in res:
-        items.append(ShortOut(
+        items.append(CardOut(
             id=r.id,
             title=r.title,
+            description=r.description,
             difficulty=r.difficulty,
             completed=r.completed,
+            created_at=r.created_at,
+            updated_at=r.updated_at,
             tags=[tag.name for tag in r.tags],
         ))
     
-    return ListShortOut(
+    return ListCardOut(
         items=items,
         total=len(items)
     )
 
-@router.get("/cards/{id}", response_model=DetailOut, status_code=status.HTTP_200_OK)
+@router.get("/cards/{id}", response_model=CardOut, status_code=status.HTTP_200_OK)
 async def get_detail(id: UUID, db: AsyncSession=Depends(get_db)):
     stmt = (
         select(Card)
@@ -72,7 +74,7 @@ async def get_detail(id: UUID, db: AsyncSession=Depends(get_db)):
     if item is None:
         raise HTTPException(404)
     
-    return DetailOut(
+    return CardOut(
         id=item.id,
         title=item.title,
         description=item.description,
@@ -83,7 +85,7 @@ async def get_detail(id: UUID, db: AsyncSession=Depends(get_db)):
         tags=[tag.name for tag in item.tags],
     )
 
-@router.post("/cards", response_model=DetailOut, status_code=status.HTTP_201_CREATED)
+@router.post("/cards", response_model=CardOut, status_code=status.HTTP_201_CREATED)
 async def add_card(
     title: str = Form(...),
     description: Optional[str] = Form(None),
@@ -115,7 +117,7 @@ async def add_card(
                 detail=str(e),
             )
             
-        return DetailOut(
+        return CardOut(
             id=item.id,
             title=item.title,
             description=item.description,
@@ -176,7 +178,7 @@ async def patch_card(
         await db.flush()
         await db.refresh(item, attribute_names=["updated_at", "tags"])
     
-        return DetailOut(
+        return CardOut(
             id=item.id,
             title=item.title,
             description=item.description,
