@@ -1,5 +1,5 @@
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from uuid import UUID
 from typing import Optional
@@ -43,6 +43,9 @@ async def get_page(page: int = 0, limit: int = 20, db: AsyncSession=Depends(get_
     )
     res = (await db.execute(stmt)).scalars().all()
     
+    count_stmt = select(func.count()).select_from(Card)
+    total = (await db.execute(count_stmt)).scalar()
+    
     items = []
     for r in res:
         items.append(CardOut(
@@ -58,7 +61,7 @@ async def get_page(page: int = 0, limit: int = 20, db: AsyncSession=Depends(get_
     
     return ListCardOut(
         items=items,
-        total=len(items)
+        total=total
     )
 
 @router.get("/cards/{id}", response_model=CardOut, status_code=status.HTTP_200_OK)

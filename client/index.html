@@ -9,12 +9,25 @@
 </head>
 
 <body>
-    <header>
-        <button id="addCardBtn">Add card</button>
-    </header>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Cardes</span>
+            <button class="btn btn-outline-primary me-2" type="button" id="addCardBtn">Add card</button>
+        </div>
+    </nav>
 
-    <section id="cardSection">
-        <div id="cardContainer" class="container-fluid w-75">
+    <nav class="fixed-bottom" id="paginationNav">
+        <ul class="pagination justify-content-center">
+            
+        </ul>
+
+        <template>
+            <li class="page-item"><a class="page-link"></a></li>
+        </template>
+    </nav>
+
+    <section id="cardSection" class="mt-4 mb-5">
+        <div id="cardContainer" class="container">
             <div class="row g-3" id="cardRow"></div>
         </div>
 
@@ -210,6 +223,8 @@
 dialog {
   width: 700px;
 }
+
+
 
 .ratio-3x4 {
   --bs-aspect-ratio: 133.333%;

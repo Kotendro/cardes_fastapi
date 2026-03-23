@@ -92,6 +92,7 @@ export function initCardForm({ dialog, form, store }) {
                 ...state,
                 screen: "list",
                 cardsById: normalize,
+                total: total,
             })
             return
         }
@@ -103,7 +104,7 @@ export function initCardForm({ dialog, form, store }) {
 
             const { items, total } = await getPage({
                 page: state.page,
-                limit: state.limit,
+                limit: state.limit
             })
             const normalize = normalizeById(items)
 
@@ -111,6 +112,7 @@ export function initCardForm({ dialog, form, store }) {
                 ...state,
                 screen: "list",
                 cardsById: normalize,
+                total: total
             })
             return
         }

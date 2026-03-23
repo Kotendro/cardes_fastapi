@@ -96,7 +96,8 @@ export function initCardDetail({ dialog, store }) {
 
             store.setState({
                 ...state1,
-                cardsById: normalize
+                cardsById: normalize,
+                total: total,
             })
         } catch (err) {
             console.error(err)

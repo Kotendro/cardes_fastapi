@@ -1,4 +1,4 @@
-import { get_thumbnail_url, getDetail, getPage } from "/js/service/api.js"
+import { get_thumbnail_url, getDetail } from "/js/service/api.js"
 
 export function initCardCatalog({ cardSection, store }) {
     const cardContainer = cardSection.querySelector("#cardContainer")
