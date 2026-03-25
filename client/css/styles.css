@@ -1,0 +1,102 @@
+dialog {
+    width: 700px;
+}
+
+.ratio-3x4 {
+    --bs-aspect-ratio: 133.333%;
+}
+
+#tagFormEditor:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+#chipsContainer { display: contents; }
+
+.container-narrow {
+  max-width: 1000px;
+}
+
+
+body {
+    background-image: 
+        url("../images/wooden-textured-background.jpg");
+    background-size: 100%;
+}
+
+/* pagination */
+#paginationNav .page-link {
+  background-color: #ffffff;
+  color: #2b3035;
+  border: 1px solid #c4c4c4;
+}
+
+#paginationNav .page-link:hover {
+    background-color: #e9e9e9;
+}
+
+#paginationNav .page-item.active .page-link {
+    background-color: #2b3035;
+    border: 1px solid #2b3035;
+    color: #ffffff;
+}
+
+/* card in catalog */
+.card-custom {
+    position: relative;
+    padding: 3px;
+    border-radius: 8px;
+
+    background: rgb(62, 62, 62);
+
+    box-shadow:
+        8px 10px 15px rgba(0,0,0,0.6);
+}
+
+.card-custom.is-completed {
+    background: linear-gradient(
+        135deg,
+        #ffbf34 0%,
+        #d39b0d 18%,
+        #ffd95a 35%,
+        #decd6c 50%,
+        #d4af37 65%,
+        #dfa907 82%,
+        #ffba1b 100%
+    );
+
+    box-shadow:
+        8px 10px 15px rgba(0,0,0,0.6);
+}
+
+.card-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.card-inner img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: grayscale(100%) brightness(1);
+}
+
+.card-custom.is-completed .card-inner img {
+    filter: none;
+}
+
+.card-name {
+    position: relative;
+    z-index: 1;
+    color: white;
+    font-weight: 600;
+    text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+}
+
+/* card_detail */
+.img-grayscale {
+    filter: grayscale(100%) brightness(1);
+}

@@ -6,13 +6,14 @@
 <head>
     <meta charset="UTF-8">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
-        <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">Cardes</span>
-            <button class="btn btn-outline-primary me-2" type="button" id="addCardBtn">Add card</button>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top" data-bs-theme="dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 fs-4 fw-semibold">Cardes</span>
+            <button class="btn btn-outline-light" type="button" id="addCardBtn">Add card</button>
         </div>
     </nav>
 
@@ -26,21 +27,24 @@
         </template>
     </nav>
 
-    <section id="cardSection" class="mt-4 mb-5">
-        <div id="cardContainer" class="container">
+    <section id="cardSection" class="pt-4 pb-4">
+        <div id="cardContainer" class="container container-narrow">
             <div class="row g-3" id="cardRow"></div>
         </div>
 
         <template id="cardTemplate">
-            <div class="col-6 col-md-4 col-lg-3">
-                <div class="w-100 ratio ratio-3x4 border rounded overflow-hidden bg-body-tertiary">
-                    <img
-                        class="w-100 h-100 object-fit-cover"
-                        alt=""
-                    >
+            <div class="col-6 col-md-4 col-lg-3 ps-3 pe-3">
+                <div class="card-custom w-100 ">
+                    <div class="card-inner">
+                        <img
+                            class="w-100 h-100 object-fit-cover"
+                            alt=""
+                        >
+                    </div>
                 </div>
-                <div class="text-center mt-1">
-                    <span></span>
+
+                <div class="text-center">
+                    <span class="card-name"></span>
                 </div>
             </div>
         </template>
@@ -141,7 +145,7 @@
 
             <div class="mt-2 d-flex justify-content-between" id="formDialogBtns">
                 <div id="leftFormDialogBtns">
-                    <button type="button" id="backBtnForm" class="btn btn-secondary d-none">
+                    <button type="button" id="backBtnForm" class="btn btn-outline-secondary d-none">
                         Back
                     </button>
                     <button type="button" id="deleteBtnForm" class="btn btn-danger d-none">
@@ -194,7 +198,7 @@
                     <div class="d-block w-100 ratio ratio-3x4 border rounded overflow-hidden bg-body-tertiary">
                         <img
                         id="imageDetail"
-                        class="w-100 h-100 object-fit-cover"
+                        class="w-100 h-100 object-fit-cover card-inner__detail"
                         alt=""
                         >
                     </div>
@@ -207,10 +211,10 @@
                 </div>
 
                 <div id="rightDetailDialogBtns">
-                    <button type="button" id="completeBtnDetail" class="btn btn-primary">
+                    <button type="button" id="completeBtnDetail" class="btn btn-warning">
                         Toggle
                     </button>
-                    <button type="button" id="editBtnDetail" class="btn btn-primary">
+                    <button type="button" id="editBtnDetail" class="btn btn-outline-dark">
                         Edit
                     </button>
                 </div>
@@ -221,29 +225,5 @@
 </body>
 
 <script type="module" src="./js/app.js"></script>
-
-<style>
-dialog {
-  width: 700px;
-}
-
-
-
-.ratio-3x4 {
-  --bs-aspect-ratio: 133.333%;
-}
-
-.img-grayscale {
-  filter: grayscale(100%);
-}
-
-#tagFormEditor:focus {
-    outline: none;
-    box-shadow: none;
-}
-
-#chipsContainer { display: contents; }
-
-</style>
 
 </html>
