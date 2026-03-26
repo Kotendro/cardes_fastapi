@@ -15,15 +15,12 @@ export function initCardCatalog({ cardSection, store }) {
 
         for (const card of cards) {
             const cardEl = cardTemplate.content.firstElementChild.cloneNode(true)
-
+            
             cardEl.dataset.cardId = card.id
-
-            const cardCustomEl = cardEl.querySelector(".card-custom")
-            cardCustomEl.classList.toggle("is-completed", card.completed)
 
             const imgEl = cardEl.querySelector("img")
             imgEl.src = get_thumbnail_url({ card })
-
+            imgEl.classList.toggle("img-grayscale", !card.completed)
             cardEl.querySelector("span").textContent = card.title
 
             cardRow.appendChild(cardEl)
