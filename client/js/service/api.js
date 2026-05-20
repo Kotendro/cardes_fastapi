@@ -5,13 +5,27 @@ function makeKey(url, method) {
 }
 
 export function get_big_image_url({card, cache=true}) {
-    if (cache) { `http://127.0.0.1:8000/static/cards/${card.id}/big.jpg?v=${card.updated_at}` }
+    if (cache) { 
+        return `http://127.0.0.1:8000/static/cards/${card.id}/big.jpg?v=${card.updated_at}`
+    }
     return `http://127.0.0.1:8000/static/cards/${card.id}/big.jpg`
 }
 
 export function get_thumbnail_url({card, cache=true}) {
-    if (cache) { `http://127.0.0.1:8000/static/cards/${card.id}/thumb.jpg?v=${card.updated_at}` }
+    if (cache) {
+        return `http://127.0.0.1:8000/static/cards/${card.id}/thumb.jpg?v=${card.updated_at}`
+    }
     return `http://127.0.0.1:8000/static/cards/${card.id}/thumb.jpg`
+}
+
+export function preloadCardImages(cards = []) {
+    for (const card of cards) {
+        const thumb = new Image()
+        thumb.src = get_thumbnail_url({ card })
+
+        const big = new Image()
+        big.src = get_big_image_url({ card })
+    }
 }
 
 export async function getPage({ page, limit } = {}) {

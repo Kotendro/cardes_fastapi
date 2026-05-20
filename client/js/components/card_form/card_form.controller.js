@@ -24,12 +24,25 @@ export function initCardForm({ dialog, form, store }) {
         render(state)
     })
 
+    // dialog.addEventListener("close", () => {
+    //     detail_reset({
+    //         difficultyDetail: difficultyDetail,
+    //         chipsContainer: chipsContainerDetail,
+    //         imageDetail: imageDetail,
+    //     })
+    // })
+
+
     function open() {
-        if (!dialog.open) dialog.showModal()
+        if (!dialog.open) {
+            dialog.showModal()
+        }
     }
 
     function close() {
-        if (dialog.open) dialog.close()
+        if (dialog.open) {
+            dialog.close()
+        }
     }
 
     function render(state) {

@@ -29,22 +29,29 @@ export function initCardDetail({ dialog, store }) {
         render(state)
     })
 
-    function open() {
-        if (!dialog.open) dialog.showModal()
-    }
-
-    function close() {
-        if (dialog.open) dialog.close()
-    }
-
-    function render(state) {
-        const card = selectCurrentCard(state)
-
+    dialog.addEventListener("close", () => {
         detail_reset({
             difficultyDetail: difficultyDetail,
             chipsContainer: chipsContainerDetail,
             imageDetail: imageDetail,
         })
+    })
+
+    function open() {
+        if (!dialog.open) {
+            dialog.showModal()
+        }
+    }
+
+    function close() {
+        if (dialog.open) {
+            dialog.close()
+        }
+    }
+
+    function render(state) {
+        const card = selectCurrentCard(state)
+
         titleDetail.textContent = card.title
         difficulty_render({
             difficulty: card.difficulty,

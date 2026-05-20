@@ -1,4 +1,4 @@
-import { getPage, getDetail } from "/js/service/api.js"
+import { getPage, preloadCardImages } from "/js/service/api.js"
 import { initCardForm } from "/js/components/card_form/card_form.controller.js"
 import { initCardDetail } from "/js/components/card_detail/card_detail.contoller.js"
 import { initCardCatalog } from "/js/cards/cards.controller.js"
@@ -22,7 +22,7 @@ const store = createStore({
     cardsById: {},
 
     page: 0,
-    limit: 4,
+    limit: 8,
     total: null
 })
 

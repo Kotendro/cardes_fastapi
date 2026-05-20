@@ -33,6 +33,10 @@ export function difficulty_render({ difficulty, difficultyDetail }) {
 }
 
 export function tags_render({ tags, chipsContainer, chipTemplate }) {
+    if (chipsContainer) {
+        chipsContainer.replaceChildren()
+    }
+
     for (const tag of tags) {
         const chip = chipTemplate.content.firstElementChild.cloneNode(true)
         chip.querySelector("span").textContent = tag

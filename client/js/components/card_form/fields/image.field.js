@@ -13,18 +13,18 @@ export function initImageField({ dialog, form }) {
     const file = imageInput.files?.[0]
 
     if (!file) {
-      restoreDefaultPreview()
-      toggleError()
-      return
+        restoreDefaultPreview()
+        toggleError()
+        return
     }
 
     const { ok, msg } = await fileValidation(file)
     toggleError(msg)
 
     if (!ok) {
-      imageInput.value = ""
-      restoreDefaultPreview()
-      return
+        imageInput.value = ""
+        restoreDefaultPreview()
+        return
     }
 
     setPreview(URL.createObjectURL(file))
