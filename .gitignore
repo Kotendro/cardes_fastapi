@@ -4,3 +4,7 @@ server/static/*
 .venv
 *.png
 *.jpg
+deprecated_client/
+node_modules/
+.vscode/
+*.tsbuildinfo
