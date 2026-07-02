@@ -1,40 +1,47 @@
 <script setup lang="ts">
     import DisplayMode from './DisplayMode.vue'
     import EditMode from './EditMode.vue'
-    import type { CardIface } from '@/types.ts'
+    import NewMode from './NewMode.vue'
+    import { type CardIface, DialogMode } from '@/types.ts'
+
+    const isOpen = defineModel<boolean>('isOpen', { required: true })
+    const dialogMode = defineModel<DialogMode>('dialogMode', { required: true })
 
     const props = defineProps<{
-        card: CardIface,
-        isOpen: boolean,
-        isEditMode: boolean,
+        card?: CardIface,
     }>()
 
-    const emit = defineEmits(["close-dialog"])
     
-
+    
 </script>
 
 
 <template>
-    <div v-show="isOpen">
+    <div v-if="isOpen">
         <div class="fixed top-0 left=0 h-full w-full bg-black/50 z-10"></div>
         <div class="fixed inset-0 z-20 flex items-center justify-center">
-            <div class="bg-white rounded-xl relative">     
+            <div class="bg-white rounded-xl relative w-[360px]">     
                 <img 
                     src="/close.svg"
                     alt="close"
                     class="h-5 absolute -left-5  z-50 opacity-50 hover:opacity-70"
-                    @click="$emit('close-dialog')"
+                    @click="isOpen = false"
                 >
 
                 <DisplayMode
-                    v-if="!isEditMode"
-                    :card="card"
+                    v-if="dialogMode === DialogMode.Display && props.card"
+                    @dialog-edit="dialogMode = DialogMode.Edit"
+                    :card="props.card"
                 />
 
                 <EditMode
-                    v-else
-                    :card="card"
+                    v-if="dialogMode === DialogMode.Edit && props.card"
+                    @dialog-display="dialogMode = DialogMode.Display"
+                    :card="props.card"
+                />
+
+                <NewMode
+                    v-if="dialogMode === DialogMode.New"
                 />
                 
             </div>

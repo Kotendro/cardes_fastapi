@@ -4,32 +4,25 @@
     import { image_url } from '@/api/api.ts'
     import { inject, ref, toRaw } from 'vue';
 
-    const props = defineProps<{
-        card: CardIface
-    }>()
 
-    const draftCard = ref<CardIface>({ 
-        ...props.card,
-        tag_names: props.card.tag_names ? [...props.card.tag_names] : []
+    const draftCard = ref<CardIface>({
+        id: '',
+        title: '',
+        difficulty: 1,
+        completed: false,
+        tag_names: [],
+        description: ''
     })
-
-    const emit = defineEmits(["dialog-display"])
-
-    const updateCard = inject<(id: string, fields: Partial<CardIface>) => void>("updateCard")
-
-    function saveChanges() {
-        if (updateCard) {
-            updateCard(props.card.id, { ...draftCard.value })
-        }
-        emit("dialog-display")
-    }
+        
+    const uploadedImage = ref<File | null>()
+    const previewUrl = ref<string>('')
 
     function setDifficulty(difficulty: number) {
         draftCard.value.difficulty = difficulty
     }
 
     function deleteTag(tag_name: string) {
-        draftCard.value.tag_names = draftCard.value.tag_names.filter(tag => tag !== tag_name)
+        draftCard.value.tag_names = draftCard.value.tag_names.filter(tag => tag != tag_name)
     }
 
     function setImage(event: Event) {
@@ -39,19 +32,17 @@
             return
         }
 
-        draftCard.value.image = fileInputElement.files[0] as File
-        draftCard.value.image_url = URL.createObjectURL(draftCard.value.image)
-        draftCard.value.thumb_url = URL.createObjectURL(draftCard.value.image)
+        uploadedImage.value = fileInputElement.files[0] as File
+        previewUrl.value = URL.createObjectURL(uploadedImage.value)
     }
 
     function addTag(event: KeyboardEvent) {
         const target = event.target as HTMLInputElement
         const value = target.value
         
-        if (value) {
+        if (value)
             draftCard.value.tag_names.push(value)
             target.value = ''
-        }
     }
 
 </script>
@@ -59,10 +50,10 @@
 <template>
     <div>
         <div>
-            <label for="fileInput">
+            <label v-if="uploadedImage" for="fileInput">
                 <div class="relative flex justify-center items-center group cursor-pointer">
                     <img 
-                        :src="draftCard.image_url"
+                        :src="previewUrl"
                         alt="card"
                         class="w-full"
                     >
@@ -72,6 +63,10 @@
                         class="h-45 absolute opacity-0 group-hover:opacity-80 transition"
                     >
                 </div>
+            </label>
+
+            <label v-else for="fileInput" class="cursor-pointer flex justify-center">
+                <span class="py-4 text-gray-400">Upload image</span>
             </label>
 
             <input 
@@ -84,7 +79,7 @@
         
         <div class="px-3 py-1 border-b border-gray-200">
             <div class="flex justify-between">
-                <input placeholder="Title" class="outline-none text-xl font-bold min-w-0" v-model="draftCard.title">
+                <input placeholder="Title" class="outline-none text-xl font-bold min-w-0" :value="draftCard.title">
                 <div class="flex flex-shrink-0">
                     <img
                         v-for="i in draftCard.difficulty"
@@ -122,23 +117,16 @@
                 >
             </div>
 
-            <textarea placeholder="Description" class="block w-full field-sizing-content overflow-y-auto outline-none resize-none" v-model="draftCard.description"></textarea>
+            <textarea placeholder="Description" class="block w-full field-sizing-content overflow-y-auto outline-none resize-none">{{ draftCard.description }}</textarea>
         </div>
 
         <div class="flex justify-between px-3 py-2">
             <span class="text-gray-400 -mt-0.5 text-sm">Edit mode</span>
             <div class="flex justify-end gap-2">
                 <img 
-                    src="/previous.svg"
-                    alt="previous"
-                    class="w-5 opacity-50 hover:opacity-70 cursor-pointer"
-                    @click="$emit('dialog-display')"
-                >
-                <img 
                     src="/save.svg"
                     alt="save"
                     class="w-5 opacity-50 hover:opacity-70 cursor-pointer"   
-                    @click="saveChanges"
                 >
             </div>
         </div>
