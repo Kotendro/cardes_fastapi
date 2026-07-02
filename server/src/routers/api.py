@@ -19,7 +19,6 @@ from src.schemas.cards import (
     ListCardOut
 )
 from src.db.models import Card
-from src.core.types import Difficulty
 from src.core.exceptions import ImageProcessingError
 from src.db.crud.tag import del_orphaned_tags, get_or_create_tags
 from src.utils.image_methods import del_images, save_images
@@ -28,7 +27,7 @@ from src.utils.image_methods import del_images, save_images
 router = APIRouter()
 
 @router.get("/cards", response_model=ListCardOut)
-async def get_page(page: int = 0, limit: int = 20, db: AsyncSession=Depends(get_db)):
+async def get_card_list(page: int = 0, limit: int = 20, db: AsyncSession=Depends(get_db)):
     """
     Minimum required information.
     Sorting. Filters.
@@ -65,7 +64,7 @@ async def get_page(page: int = 0, limit: int = 20, db: AsyncSession=Depends(get_
     )
 
 @router.get("/cards/{id}", response_model=CardOut, status_code=status.HTTP_200_OK)
-async def get_detail(id: UUID, db: AsyncSession=Depends(get_db)):
+async def get_card(id: UUID, db: AsyncSession=Depends(get_db)):
     stmt = (
         select(Card)
         .options(selectinload(Card.tags))
@@ -92,15 +91,15 @@ async def get_detail(id: UUID, db: AsyncSession=Depends(get_db)):
 async def add_card(
     title: str = Form(...),
     description: Optional[str] = Form(None),
-    difficulty: Difficulty = Form(...),
+    difficulty: int = Form(...),
     completed: bool = Form(...),
-    tag_names: list[str] = Form([]),
+    tags: list[str] = Form([]),
     image: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
 ):
     
     async with db.begin():
-        tag_objs = await get_or_create_tags(db, tag_names)
+        tag_objs = await get_or_create_tags(db, tags)
         
         item = Card(
             title=title,
@@ -136,9 +135,9 @@ async def patch_card(
     id: UUID,
     title: Optional[str] = Form(None),
     description: Optional[str] = Form(None),
-    difficulty: Optional[Difficulty] = Form(None),
+    difficulty: Optional[int] = Form(None),
     completed: Optional[bool] = Form(None),
-    tag_names: Optional[list[str]] = Form(None),
+    tags: Optional[list[str]] = Form(None),
     image: Optional[UploadFile] = File(None),
     db: AsyncSession = Depends(get_db),
 ):
@@ -163,15 +162,16 @@ async def patch_card(
         if completed is not None:
             item.completed = completed
 
-        if tag_names is not None:
+        if tags is not None:
             old_tag_ids = [t.id for t in item.tags]
-            item.tags = await get_or_create_tags(db, tag_names)
+            item.tags = await get_or_create_tags(db, tags)
             await db.flush()
             await del_orphaned_tags(db, old_tag_ids)
 
         if image is not None:
             try:
                 await save_images(image, item_id=item.id)
+                item.updated_at = func.now()
             except ImageProcessingError as e:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,

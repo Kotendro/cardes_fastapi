@@ -4,7 +4,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from sqlalchemy.types import String, Text, DateTime, Enum
 from datetime import datetime
-from src.core.types import Difficulty
 from uuid import UUID, uuid4
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -15,10 +14,7 @@ class Card(Base):
     id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, default=uuid4)
     title: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=True)
-    difficulty: Mapped[Difficulty] = mapped_column(
-        Enum(Difficulty, name="difficulty_enum"),
-        nullable=False
-    )
+    difficulty: Mapped[int] = mapped_column(nullable=False)
     completed: Mapped[bool] = mapped_column(nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

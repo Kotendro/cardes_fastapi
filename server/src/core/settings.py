@@ -19,7 +19,7 @@ class DatabaseSettings(BaseModel):
             f"{self.pg_db}"
         )
 
-class PathSettings(BaseModel):    
+class PathSettings(BaseModel):
     static: Path
     
 

@@ -1,14 +1,13 @@
 from datetime import datetime
 from uuid import UUID
 from pydantic import BaseModel
-from src.core.types import Difficulty
     
 class CardOut(BaseModel):
     """All required information of card."""
     id: UUID
     title: str
     description: str | None
-    difficulty: Difficulty
+    difficulty: int
     completed: bool
     created_at: datetime
     updated_at: datetime
