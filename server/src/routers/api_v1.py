@@ -112,7 +112,7 @@ async def add_card(
         await db.flush()
         
         try:
-            await save_images(image, item_id=item.id)
+            await save_images(image, card_id=item.id)
         except ImageProcessingError as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -170,7 +170,7 @@ async def patch_card(
 
         if image is not None:
             try:
-                await save_images(image, item_id=item.id)
+                await save_images(image, card_id=item.id)
                 item.updated_at = func.now()
             except ImageProcessingError as e:
                 raise HTTPException(

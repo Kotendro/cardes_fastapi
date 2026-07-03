@@ -6,6 +6,7 @@ from src.routers import include_routers
 from src.core.lifespan import lifespan
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import uvicorn
 
 app = FastAPI(lifespan=lifespan)
 
@@ -26,3 +27,8 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="./src/static"), name="static")
 
 include_routers(app)
+
+
+def run_dev():
+    # poetry script to run dev
+    uvicorn.run("src.main:app", reload=True)
