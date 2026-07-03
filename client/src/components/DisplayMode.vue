@@ -51,7 +51,7 @@
             </div>
 
             <div class="flex gap-1 w-80 overflow-auto">
-                <Tag v-for="(tag, index) in card.tag_names" :key="index" :tagText="tag"/>
+                <Tag v-for="(tag, index) in card.tags" :key="index" :tagText="tag"/>
             </div>
 
             <p class="w-full field-sizing-content overflow-y-auto">{{ card.description }}</p>

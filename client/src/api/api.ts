@@ -14,7 +14,6 @@ export function preload_image_url(card: CardIface){
     if (card.image_url) {
         const img = new Image()
         img.src = card.image_url
-        console.log(`cached ${card.image_url}`)
     }
 }
 
@@ -51,8 +50,6 @@ export async function patch_card(id: string, updatedFields: Partial<CardIface>) 
     const formData = new FormData()
 
     for (const [key, value] of Object.entries(updatedFields)) {
-        if (value === undefined || value === null) continue
-
         if (value instanceof File) {
             formData.append(key, value)
         } else if (Array.isArray(value)) {
@@ -61,6 +58,8 @@ export async function patch_card(id: string, updatedFields: Partial<CardIface>) 
             formData.append(key, String(value));
         }
     }
+
+    console.log(formData)
 
     const respons = await axios.patch(`http://127.0.0.1:8000/api/v1/cards/${id}`, formData)
     return respons

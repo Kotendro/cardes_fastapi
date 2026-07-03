@@ -10,7 +10,7 @@
         title: '',
         difficulty: 1,
         completed: false,
-        tag_names: [],
+        tags: [],
         description: ''
     })
         
@@ -22,7 +22,7 @@
     }
 
     function deleteTag(tag_name: string) {
-        draftCard.value.tag_names = draftCard.value.tag_names.filter(tag => tag != tag_name)
+        draftCard.value.tags = draftCard.value.tags.filter(tag => tag != tag_name)
     }
 
     function setImage(event: Event) {
@@ -41,7 +41,7 @@
         const value = target.value
         
         if (value)
-            draftCard.value.tag_names.push(value)
+            draftCard.value.tags.push(value)
             target.value = ''
     }
 
@@ -102,7 +102,7 @@
 
             <div class="flex gap-1 w-80 overflow-auto">
                 <Tag
-                    v-for="(tag, index) in draftCard.tag_names"
+                    v-for="(tag, index) in draftCard.tags"
                     :key="index"
                     :tagText="tag"
                     :dialogMode="DialogMode.Edit"

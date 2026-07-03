@@ -3,7 +3,7 @@ export interface CardIface {
     title: string
     difficulty: number
     completed: boolean
-    tag_names: string[]
+    tags: string[]
     description: string
     image?: File // Удобство для отправки изменений в API
     image_url?: string

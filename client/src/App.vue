@@ -47,6 +47,7 @@
         preload_image_url(cards.value[index])
 
         if (response.status !== 200) {
+            console.log(`updateCard error: STATUS ${response.status}`)
             cards.value[index] = originalCard as CardIface
         }
     }
