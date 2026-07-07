@@ -8,3 +8,4 @@ deprecated_client/
 node_modules/
 .vscode/
 *.tsbuildinfo
+.DS_store

@@ -148,7 +148,7 @@ async def patch_card(id: UUID, data: CardPatch, db: AsyncSession=Depends(get_db)
         if card is None:
             raise HTTPException(404)
         
-        if (data.title is not None) and (data.title != ""):
+        if (data.title is not None) and (data.title.strip() != ""):
             card.title = data.title
         if data.description is not None:
             card.description = data.description
@@ -179,6 +179,12 @@ async def patch_card(id: UUID, data: CardPatch, db: AsyncSession=Depends(get_db)
 
 @router.post("/cards", status_code=status.HTTP_201_CREATED)
 async def add_card(data: CardAdd, db: AsyncSession=Depends(get_db)):
+    if (data.title.strip() == ""):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="title is empty"
+        )
+    
     async with db.begin():
         tag_objs = await get_or_create_tags(db, data.tags)
         
