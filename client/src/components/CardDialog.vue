@@ -21,7 +21,7 @@
                 <img 
                     src="/close.svg"
                     alt="close"
-                    class="h-5 absolute -left-5  z-50 opacity-50 hover:opacity-70"
+                    class="h-5 absolute -top-3.5 -right-5 z-50 opacity-50 hover:opacity-70"
                     @click="isOpen = false"
                 >
 

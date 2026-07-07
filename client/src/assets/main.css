@@ -2,4 +2,9 @@
 
 body {
     background-color: rgb(160, 162, 206);
+    background-image: url('/background.jpg');
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-attachment: fixed;
+    background-size: cover;
 }

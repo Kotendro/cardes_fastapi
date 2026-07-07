@@ -166,39 +166,42 @@
             :card="currentCard"
         />
 
-        <div class="bg-white w-4/5 m-auto shadow-xs w-5/6 h-min-screen">
-            
-            <Header
-                @open-dialog-new="openNew"
-            />
-
-            <!-- <div class="flex justify-between px-16 mt-4">
-                <h1 class="text-2xl">Catalog</h1>
-                <div class="relative">
-                    <img 
-                        src="/search.svg" alt="search"
-                        class="absolute left-3 top-2 h-5 opacity-50"
-                    >
-                    <input 
-                        type="text" placeholder="Search..."
-                        class="border border-gray-300 rounded-md pl-10 pr-4 py-2 outline-none focus:border-gray-400 text-sm"
-                    >
-                </div>
-            </div> -->
-
-            <div class="grid md:grid-cols-4 sm:grid-cols-3 gap-8 px-16 py-4">
-                <Card
-                    v-for="card in cards"
-                    :key="card.id"
-                    :imageUrl="card.thumb_url"
-                    :title="card.title"
-                    :difficulty="card.difficulty"
-                    :isComplete="card.completed"
-                    @click="openDisplay(card.id)"
-                    @mouseenter="handleMouseEnterCard(card)"
+        <div class="flex flex-col items-center justify-center px-3 w-full">
+            <div class="w-full max-w-max bg-white shadow-xs rounded-lg mt-3 p-4">
+                
+                <Header
+                    @open-dialog-new="openNew"
                 />
-            </div>
 
+                <!-- <div class="flex justify-between px-16 mt-4">
+                    <h1 class="text-2xl">Catalog</h1>
+                    <div class="relative">
+                        <img 
+                            src="/search.svg" alt="search"
+                            class="absolute left-3 top-2 h-5 opacity-50"
+                        >
+                        <input 
+                            type="text" placeholder="Search..."
+                            class="border border-gray-300 rounded-md pl-10 pr-4 py-2 outline-none focus:border-gray-400 text-sm"
+                        >
+                    </div>
+                </div> -->
+                <div class="mt-4">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-4 justify-center">
+                        <Card
+                            v-for="card in cards"
+                            class="w-[170px]"
+                            :key="card.id"
+                            :imageUrl="card.thumb_url"
+                            :title="card.title"
+                            :difficulty="card.difficulty"
+                            :isComplete="card.completed"
+                            @click="openDisplay(card.id)"
+                            @mouseenter="handleMouseEnterCard(card)"
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>

@@ -4,7 +4,7 @@
 </script>
 
 <template>
-    <header class="flex justify-between border-b border-gray-200 px-16 py-4">
+    <header class="flex justify-between border-b border-gray-200 px-10 pb-3">
         <div class="flex flex-col">
             <h1 class="text-xl font-bold">Cardes</h1>
             <span class="text-gray-500 -mt-2 text-sm">your achievements</span>
