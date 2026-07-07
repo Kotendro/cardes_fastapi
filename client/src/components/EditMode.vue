@@ -13,16 +13,25 @@
         tags: props.card.tags ? [...props.card.tags] : []
     })
 
-    const emit = defineEmits(["dialog-display"])
+    const emit = defineEmits(["dialog-display", "close-dialog"])
 
     const updateCard = inject<(id: string, fields: Partial<CardIface>) => void>("updateCard")
+    const deleteCard = inject<(id: string) => void>("deleteCard")
 
     function saveChanges() {
         if (updateCard) {
             updateCard(props.card.id, { ...draftCard.value })
+            emit("dialog-display")
         }
-        emit("dialog-display")
     }
+
+    function delCard() {
+        if (deleteCard) {
+            emit("close-dialog")
+            deleteCard(props.card.id)
+        }
+    }
+
 
     function setDifficulty(difficulty: number) {
         draftCard.value.difficulty = difficulty
@@ -84,7 +93,11 @@
         
         <div class="px-3 py-1 border-b border-gray-200">
             <div class="flex justify-between">
-                <input placeholder="Title" class="outline-none text-xl font-bold min-w-0" v-model="draftCard.title">
+                <input
+                    placeholder="*Title"
+                    class="outline-none text-xl font-bold min-w-0"
+                    v-model="draftCard.title"
+                >
                 <div class="flex flex-shrink-0">
                     <img
                         v-for="i in draftCard.difficulty"
@@ -124,22 +137,30 @@
 
             <textarea placeholder="Description" class="block w-full field-sizing-content overflow-y-auto outline-none resize-none" v-model="draftCard.description"></textarea>
         </div>
+        <div class="flex flex-col px-3 py-2 gap-2">
 
-        <div class="flex justify-between px-3 py-2">
-            <span class="text-gray-400 -mt-0.5 text-sm">Edit mode</span>
-            <div class="flex justify-end gap-2">
-                <img 
-                    src="/previous.svg"
-                    alt="previous"
-                    class="w-5 opacity-50 hover:opacity-70 cursor-pointer"
-                    @click="$emit('dialog-display')"
-                >
-                <img 
-                    src="/save.svg"
-                    alt="save"
-                    class="w-5 opacity-50 hover:opacity-70 cursor-pointer"   
-                    @click="saveChanges"
-                >
+            <div class="flex justify-between items-center">
+                <span class="text-gray-400 -mt-0.5 text-sm">Edit mode</span>
+                <div class="flex justify-end gap-2">
+                    <img 
+                        src="/previous.svg"
+                        alt="previous"
+                        class="w-5 opacity-50 hover:opacity-70 cursor-pointer"
+                        @click="$emit('dialog-display')"
+                    >
+                    <img 
+                        src="/delete.svg"
+                        alt="previous"
+                        class="w-5 opacity-50 hover:opacity-70 cursor-pointer"
+                        @click="delCard"
+                    >
+                    <img 
+                        src="/save.svg"
+                        alt="save"
+                        class="w-5 opacity-50 hover:opacity-70 cursor-pointer"   
+                        @click="saveChanges"
+                    >
+                </div>
             </div>
         </div>
     </div>

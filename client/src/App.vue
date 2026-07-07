@@ -3,7 +3,7 @@
     import Card from './components/Card.vue'
     import CardDialog from './components/CardDialog.vue'
     import { DialogMode, type CardIface } from '@/types.ts'
-    import { get_card_list, image_url, patch_card, preload_image_url, preload_image_urls, thumb_url } from './api/api.ts'
+    import { add_card, delete_card, get_card_list, image_url, patch_card, preload_image_url, preload_image_urls, thumb_url, upload_image } from './api/api.ts'
     import { ref, computed, provide, onMounted } from 'vue'
 
 
@@ -30,25 +30,111 @@
         currentCardID.value = null
     }
 
+    function handleMouseEnterCard(card: CardIface) {
+        preload_image_url(card)
+    }
+
     async function updateCard(id: string, updatedFields: Partial<CardIface>) {
         const index = cards.value.findIndex(c => c.id === id)
-        if (index === -1) {
-            return
+        if (index === -1) { return }
+
+        const currentCard = cards.value[index]
+        const originalCard = { ...cards.value[index] } as CardIface
+
+        try {
+            // Меняем клиенткуй часть
+            Object.assign(cards.value[index]!, updatedFields)
+
+            // Меняем текстовые данные на сервере
+            let patchResponse = await patch_card(id, updatedFields)
+            cards.value[index] = { ...cards.value[index], ...patchResponse.data } as CardIface
+            if (patchResponse.status !== 200) {
+                throw new Error(`PATCH card failed with status ${patchResponse.status}`)
+            }
+            // Меняем картинку на сервере
+            if (updatedFields.image instanceof File) {
+                let imageResponse = await upload_image(id, updatedFields.image as File)
+                if (imageResponse.status !== 200) {
+                    throw new Error(`Upload image failed with status ${imageResponse.status}`);
+                }
+                const newBigUrl = image_url(cards.value[index], false)
+                const newThumbUrl = thumb_url(cards.value[index], false)
+
+                const img = new Image()
+                img.onload = () => { cards.value[index]!.image_url = newBigUrl }
+                img.src = newBigUrl
+
+                const thumb = new Image()
+                thumb.onload = () => { cards.value[index]!.thumb_url = newThumbUrl }
+                thumb.src = newThumbUrl
+            }
+        } catch (err) {
+            console.error('updateCard error:', err)
+            cards.value[index] = originalCard;
         }
-        const originalCard = { ...cards.value[index] }
+    }
 
-        cards.value[index] = { ...cards.value[index], ...updatedFields } as CardIface
+    async function addCard(newCard: CardIface) {
+        let serverCard: CardIface | undefined = undefined
+        
+        try {
+            cards.value.push(newCard)
+            let addResponse = await add_card(newCard)
+            if (addResponse.status !== 201) {
+                throw new Error(`ADD card failed with status ${addResponse.status}`)
+            }
 
-        const response = await patch_card(id, updatedFields)
-        cards.value[index] = { ...cards.value[index], ...response.data} as CardIface
+            serverCard = addResponse.data as CardIface
 
-        cards.value[index].image_url = image_url(cards.value[index], false)
-        cards.value[index].thumb_url = thumb_url(cards.value[index], false)
-        preload_image_url(cards.value[index])
+            if (!(newCard.image instanceof File)) {
+                throw new Error(`ADD card failed: image doesn't exist `)
+            }
+            let imageResponse = await upload_image(serverCard.id, newCard.image)
+            if (imageResponse.status !== 200) {
+                throw new Error(`Upload image failed with status ${imageResponse.status}`);
+            }
+            const newBigUrl = image_url(serverCard, false)
+            const newThumbUrl = thumb_url(serverCard, false)
 
-        if (response.status !== 200) {
-            console.log(`updateCard error: STATUS ${response.status}`)
-            cards.value[index] = originalCard as CardIface
+            const img = new Image()
+            img.onload = () => { cards.value[index]!.image_url = newBigUrl }
+            img.src = newBigUrl
+
+            const thumb = new Image()
+            thumb.onload = () => { cards.value[index]!.thumb_url = newThumbUrl }
+            thumb.src = newThumbUrl
+
+            const index = cards.value.findIndex(c => c.id === newCard.id)
+            if (index !== -1) {
+                Object.assign(cards.value[index]!, serverCard)
+            }
+
+        } catch (err) {
+            console.error('addCard error:', err)
+
+            cards.value = cards.value.filter(c => c.id !== newCard.id && c.id !== serverCard?.id)
+
+            if (serverCard) {
+                await delete_card(serverCard.id) 
+            }
+        }
+    }
+
+    async function deleteCard(id: string) {
+        const index = cards.value.findIndex(c => c.id === id)
+        if (index === -1) { return }
+        
+        const deletedCard = cards.value[index] as CardIface
+
+        try {
+            cards.value = cards.value.filter(c => c.id !== id)
+            const deleteResponse = await delete_card(id)
+            if (deleteResponse.status !== 204) {
+                throw new Error(`DELETE card failed with status ${deleteResponse.status}`)
+            }
+        } catch (err) {
+            console.error("deleteCard error:", err)
+            cards.value.splice(index, 0, deletedCard)
         }
     }
 
@@ -67,7 +153,8 @@
     })
 
     provide("updateCard", updateCard)
-    provide("dialogMode", dialogMode)
+    provide("addCard", addCard)
+    provide("deleteCard", deleteCard)
 
 </script>
 
@@ -79,7 +166,7 @@
             :card="currentCard"
         />
 
-        <div class="bg-white w-4/5 m-auto rounded-xl shadow-xs my-8">
+        <div class="bg-white w-4/5 m-auto shadow-xs w-5/6 h-min-screen">
             
             <Header
                 @open-dialog-new="openNew"
@@ -99,7 +186,7 @@
                 </div>
             </div> -->
 
-            <div class="grid grid-cols-4 gap-8 px-16 py-4">
+            <div class="grid md:grid-cols-4 sm:grid-cols-3 gap-8 px-16 py-4">
                 <Card
                     v-for="card in cards"
                     :key="card.id"
@@ -108,6 +195,7 @@
                     :difficulty="card.difficulty"
                     :isComplete="card.completed"
                     @click="openDisplay(card.id)"
+                    @mouseenter="handleMouseEnterCard(card)"
                 />
             </div>
 

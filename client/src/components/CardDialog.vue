@@ -10,9 +10,6 @@
     const props = defineProps<{
         card?: CardIface,
     }>()
-
-    
-    
 </script>
 
 
@@ -37,11 +34,13 @@
                 <EditMode
                     v-if="dialogMode === DialogMode.Edit && props.card"
                     @dialog-display="dialogMode = DialogMode.Display"
+                    @close-dialog="isOpen = false"
                     :card="props.card"
                 />
 
                 <NewMode
                     v-if="dialogMode === DialogMode.New"
+                    @close-dialog="isOpen = false"
                 />
                 
             </div>

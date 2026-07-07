@@ -22,12 +22,14 @@
 
 <template>
     <div>
-        <img 
-            :src="card.image_url"
-            alt="USA"
-            class="w-full" 
-            :class="{ 'grayscale-95' : !card.completed}"
-        >
+        <div>
+            <img 
+                :src="card.image_url"
+                alt="cover"
+                class="w-full" 
+                :class="{ 'grayscale-95' : !card.completed}"
+            >
+        </div>
         
         <div class="px-3 py-1 border-b border-gray-200">
             <div class="flex justify-between">
