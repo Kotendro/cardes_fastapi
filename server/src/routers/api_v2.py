@@ -149,9 +149,9 @@ async def patch_card(id: UUID, data: CardPatch, db: AsyncSession=Depends(get_db)
             raise HTTPException(404)
         
         if (data.title is not None) and (data.title.strip() != ""):
-            card.title = data.title
+            card.title = data.title.strip()
         if data.description is not None:
-            card.description = data.description
+            card.description = data.description.strip()
         if data.difficulty is not None:
             card.difficulty = data.difficulty
         if data.completed is not None:
@@ -188,9 +188,14 @@ async def add_card(data: CardAdd, db: AsyncSession=Depends(get_db)):
     async with db.begin():
         tag_objs = await get_or_create_tags(db, data.tags)
         
+        if (data.title is not None):
+            title = data.title.strip()
+        if (data.description is not None):
+            description = data.description.strip()
+        
         card = Card(
-            title=data.title,
-            description=data.description,
+            title=title,
+            description=description,
             difficulty=data.difficulty,
             completed=data.completed,
             tags=tag_objs
