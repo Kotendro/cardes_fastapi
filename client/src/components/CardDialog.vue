@@ -16,8 +16,8 @@
 <template>
     <div v-if="isOpen">
         <div class="fixed top-0 left=0 h-full w-full bg-black/50 z-10"></div>
-        <div class="fixed inset-0 z-20 flex items-center justify-center">
-            <div class="bg-white rounded-xl relative w-[360px]">     
+        <div class="fixed inset-0 z-20 flex justify-center overflow-y-auto py-3">
+            <div class="bg-white rounded-xl relative w-[360px] my-auto">     
                 <img 
                     src="/close.svg"
                     alt="close"

@@ -44,7 +44,7 @@
 <template>
     <div 
         v-if="pagePagination.length > 1"
-        class="fixed bg-white shadow-xs rounded-lg px-2 bottom-3"
+        class="fixed bg-white shadow-xs rounded-lg px-1 bottom-3"
     >
         <img 
             v-if="currentPage !== 0" 

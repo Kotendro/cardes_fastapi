@@ -175,7 +175,7 @@
             :card="currentCard"
         />
 
-        <div class="flex flex-col items-center justify-center px-3 w-full">
+        <div class="flex items-center justify-center px-3 w-full min-h-screen">
             <div class="w-full max-w-max bg-white shadow-xs rounded-lg mt-3 mb-16 p-4">
                 
                 <Header

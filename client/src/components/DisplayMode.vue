@@ -55,7 +55,7 @@
                 <Tag v-for="(tag, index) in card.tags" :key="index" :tagText="tag"/>
             </div>
 
-            <p class="w-full field-sizing-content overflow-y-auto">{{ card.description }}</p>
+            <p class="whitespace-pre-wrap w-full field-sizing-content overflow-y-auto">{{ card.description }}</p>
         </div>
 
         <div class="flex justify-between px-3 py-2">
