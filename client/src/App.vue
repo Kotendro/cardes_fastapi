@@ -2,12 +2,16 @@
     import Header from './components/Header.vue'
     import Card from './components/Card.vue'
     import CardDialog from './components/CardDialog.vue'
+    import Pagination from './components/Pagination.vue'
     import { DialogMode, type CardIface } from '@/types.ts'
-    import { add_card, delete_card, get_card_list, image_url, patch_card, preload_image_url, preload_image_urls, thumb_url, upload_image } from './api/api.ts'
+    import { addCardRequest, deleteCardRequest, getCardListRequest, imageURL, patchCardRequest, preloadImageURL, preloadImageURLs, thumbURL, uploadImageRequest } from './api/api.ts'
     import { ref, computed, provide, onMounted } from 'vue'
 
 
     const cards = ref<CardIface[]>([])
+    const totalCards = ref<number>(0) // Всего карточек из запроса
+    const currentPage = ref<number>(0) // Текущая страница
+    const limit = 10 // Максимум карт на странице
 
     let isOpen = ref<boolean>(false)
     let dialogMode = ref<DialogMode>(DialogMode.Display)
@@ -31,14 +35,13 @@
     }
 
     function handleMouseEnterCard(card: CardIface) {
-        preload_image_url(card)
+        preloadImageURL(card)
     }
 
-    async function updateCard(id: string, updatedFields: Partial<CardIface>) {
+    async function patchCard(id: string, updatedFields: Partial<CardIface>) {
         const index = cards.value.findIndex(c => c.id === id)
         if (index === -1) { return }
 
-        const currentCard = cards.value[index]
         const originalCard = { ...cards.value[index] } as CardIface
 
         try {
@@ -46,19 +49,19 @@
             Object.assign(cards.value[index]!, updatedFields)
 
             // Меняем текстовые данные на сервере
-            let patchResponse = await patch_card(id, updatedFields)
+            let patchResponse = await patchCardRequest(id, updatedFields)
             cards.value[index] = { ...cards.value[index], ...patchResponse.data } as CardIface
             if (patchResponse.status !== 200) {
                 throw new Error(`PATCH card failed with status ${patchResponse.status}`)
             }
             // Меняем картинку на сервере
             if (updatedFields.image instanceof File) {
-                let imageResponse = await upload_image(id, updatedFields.image as File)
+                let imageResponse = await uploadImageRequest(id, updatedFields.image as File)
                 if (imageResponse.status !== 200) {
                     throw new Error(`Upload image failed with status ${imageResponse.status}`);
                 }
-                const newBigUrl = image_url(cards.value[index], false)
-                const newThumbUrl = thumb_url(cards.value[index], false)
+                const newBigUrl = imageURL(cards.value[index], false)
+                const newThumbUrl = thumbURL(cards.value[index], false)
 
                 const img = new Image()
                 img.onload = () => { cards.value[index]!.image_url = newBigUrl }
@@ -69,7 +72,7 @@
                 thumb.src = newThumbUrl
             }
         } catch (err) {
-            console.error('updateCard error:', err)
+            console.error('patchCard error:', err)
             cards.value[index] = originalCard;
         }
     }
@@ -79,7 +82,7 @@
         
         try {
             cards.value.push(newCard)
-            let addResponse = await add_card(newCard)
+            let addResponse = await addCardRequest(newCard)
             if (addResponse.status !== 201) {
                 throw new Error(`ADD card failed with status ${addResponse.status}`)
             }
@@ -89,12 +92,12 @@
             if (!(newCard.image instanceof File)) {
                 throw new Error(`ADD card failed: image doesn't exist `)
             }
-            let imageResponse = await upload_image(serverCard.id, newCard.image)
+            let imageResponse = await uploadImageRequest(serverCard.id, newCard.image)
             if (imageResponse.status !== 200) {
                 throw new Error(`Upload image failed with status ${imageResponse.status}`);
             }
-            const newBigUrl = image_url(serverCard, false)
-            const newThumbUrl = thumb_url(serverCard, false)
+            const newBigUrl = imageURL(serverCard, false)
+            const newThumbUrl = thumbURL(serverCard, false)
 
             const img = new Image()
             img.onload = () => { cards.value[index]!.image_url = newBigUrl }
@@ -115,7 +118,7 @@
             cards.value = cards.value.filter(c => c.id !== newCard.id && c.id !== serverCard?.id)
 
             if (serverCard) {
-                await delete_card(serverCard.id) 
+                await deleteCardRequest(serverCard.id) 
             }
         }
     }
@@ -128,7 +131,7 @@
 
         try {
             cards.value = cards.value.filter(c => c.id !== id)
-            const deleteResponse = await delete_card(id)
+            const deleteResponse = await deleteCardRequest(id)
             if (deleteResponse.status !== 204) {
                 throw new Error(`DELETE card failed with status ${deleteResponse.status}`)
             }
@@ -138,21 +141,27 @@
         }
     }
 
-    onMounted(async () => {
+    async function getCardList(page: number) {
         try {
-            const data = await get_card_list(0, 20)
+            currentPage.value = page
+            const data = await getCardListRequest(page, limit)
             cards.value = data.items
+            totalCards.value = data.total
             cards.value.forEach(c => {
-                c.image_url = image_url(c)
-                c.thumb_url = thumb_url(c)
+                c.image_url = imageURL(c)
+                c.thumb_url = thumbURL(c)
             })
+            preloadImageURLs(cards.value)
         } catch (err) {
-            console.log(err)
+            console.error("getCardList error:", err)
         }
-        preload_image_urls(cards.value)
+    }
+
+    onMounted(() => {
+        getCardList(currentPage.value);
     })
 
-    provide("updateCard", updateCard)
+    provide("patchCard", patchCard)
     provide("addCard", addCard)
     provide("deleteCard", deleteCard)
 
@@ -167,25 +176,13 @@
         />
 
         <div class="flex flex-col items-center justify-center px-3 w-full">
-            <div class="w-full max-w-max bg-white shadow-xs rounded-lg mt-3 p-4">
+            <div class="w-full max-w-max bg-white shadow-xs rounded-lg mt-3 mb-16 p-4">
                 
                 <Header
                     @open-dialog-new="openNew"
                 />
 
-                <!-- <div class="flex justify-between px-16 mt-4">
-                    <h1 class="text-2xl">Catalog</h1>
-                    <div class="relative">
-                        <img 
-                            src="/search.svg" alt="search"
-                            class="absolute left-3 top-2 h-5 opacity-50"
-                        >
-                        <input 
-                            type="text" placeholder="Search..."
-                            class="border border-gray-300 rounded-md pl-10 pr-4 py-2 outline-none focus:border-gray-400 text-sm"
-                        >
-                    </div>
-                </div> -->
+
                 <div class="mt-4">
                     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-4 justify-center">
                         <Card
@@ -202,6 +199,13 @@
                     </div>
                 </div>
             </div>
+
+            <Pagination 
+                :currentPage="currentPage"
+                :totalCards="totalCards"
+                :limit="limit"
+                @page-changed="getCardList"
+            />
         </div>
     </div>
 </template>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
     import Tag from './Tag.vue'
-    import { type CardIface, DialogMode } from '@/types.ts'
-    import { image_url } from '@/api/api.ts'
+    import { type CardIface } from '@/types.ts'
     import { inject } from 'vue';
 
     const props = defineProps<{
@@ -10,11 +9,11 @@
 
     const emit = defineEmits(['dialog-edit'])
 
-    const updateCard = inject<(id: string, fields: Partial<CardIface>) => void>("updateCard")
+    const patchCard = inject<(id: string, fields: Partial<CardIface>) => void>("patchCard")
     
-    function toggleComplete() {
-        if (updateCard) {
-            updateCard(props.card.id, { completed: !props.card.completed })
+    function completeCardBtn() {
+        if (patchCard) {
+            patchCard(props.card.id, { completed: !props.card.completed })
         }
     }
 
@@ -65,7 +64,7 @@
                 <img
                     src="/complete2.svg"
                     alt="complete"
-                    @click="toggleComplete"
+                    @click="completeCardBtn"
                     class="w-5 opacity-50 hover:opacity-70 cursor-pointer">
                 <img 
                     src="/edit.svg"

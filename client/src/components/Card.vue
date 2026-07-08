@@ -14,9 +14,9 @@
             hover:-translate-y-1 hover:shadow-xl transition"
         :class="{ 'grayscale-95' : !isComplete}"
     >
-        <img :src="imageUrl" class="w-full">
+        <img :src="imageUrl" class="w-full h-full">
         <div class="
-            absolute inset-x-0 bottom-0 py-2 flex flex-col place-items-center bg-black/50 backdrop-blur-sm
+            absolute inset-x-0 bottom-0 py-1 flex flex-col place-items-center bg-black/50 backdrop-blur-sm
             opacity-0 group-hover:opacity-100 transition-opacity duration-50
         ">
             <div class="flex">

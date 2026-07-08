@@ -1,7 +1,6 @@
 <script setup lang="ts">
     import Tag from './Tag.vue'
     import { type CardIface, DialogMode } from '@/types.ts'
-    import { image_url } from '@/api/api.ts'
     import { inject, ref, toRaw } from 'vue';
 
     const props = defineProps<{
@@ -15,17 +14,17 @@
 
     const emit = defineEmits(["dialog-display", "close-dialog"])
 
-    const updateCard = inject<(id: string, fields: Partial<CardIface>) => void>("updateCard")
+    const patchCard = inject<(id: string, fields: Partial<CardIface>) => void>("patchCard")
     const deleteCard = inject<(id: string) => void>("deleteCard")
 
-    function saveChanges() {
-        if (updateCard) {
-            updateCard(props.card.id, { ...draftCard.value })
+    function saveCardBtn() {
+        if (patchCard) {
+            patchCard(props.card.id, { ...draftCard.value })
             emit("dialog-display")
         }
     }
 
-    function delCard() {
+    function deleteCardBtn() {
         if (deleteCard) {
             emit("close-dialog")
             deleteCard(props.card.id)
@@ -152,13 +151,13 @@
                         src="/delete.svg"
                         alt="previous"
                         class="w-5 opacity-50 hover:opacity-70 cursor-pointer"
-                        @click="delCard"
+                        @click="deleteCardBtn"
                     >
                     <img 
                         src="/save.svg"
                         alt="save"
                         class="w-5 opacity-50 hover:opacity-70 cursor-pointer"   
-                        @click="saveChanges"
+                        @click="saveCardBtn"
                     >
                 </div>
             </div>

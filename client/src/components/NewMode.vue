@@ -1,8 +1,7 @@
 <script setup lang="ts">
     import Tag from './Tag.vue'
     import { type CardIface, DialogMode } from '@/types.ts'
-    import { image_url } from '@/api/api.ts'
-    import { inject, ref, toRaw } from 'vue';
+    import { inject, ref } from 'vue';
 
     const emit = defineEmits(["close-dialog"])
 
@@ -17,7 +16,7 @@
 
     const addCard = inject<(newCard: CardIface) => void>("addCard")
 
-    function saveNewCard() {
+    function saveCardBtn() {
         if (addCard) {
             addCard({ ...draftCard.value })
             emit('close-dialog')
@@ -142,7 +141,7 @@
                     src="/save.svg"
                     alt="save"
                     class="w-5 opacity-50 hover:opacity-70 cursor-pointer"   
-                    @click="saveNewCard"
+                    @click="saveCardBtn"
                 >
             </div>
         </div>
