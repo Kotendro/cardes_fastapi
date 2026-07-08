@@ -11,7 +11,7 @@
     const cards = ref<CardIface[]>([])
     const totalCards = ref<number>(0) // Всего карточек из запроса
     const currentPage = ref<number>(0) // Текущая страница
-    const limit = 10 // Максимум карт на странице
+    const limit = 20 // Максимум карт на странице
 
     let isOpen = ref<boolean>(false)
     let dialogMode = ref<DialogMode>(DialogMode.Display)

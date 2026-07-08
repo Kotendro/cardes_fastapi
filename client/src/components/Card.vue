@@ -16,7 +16,7 @@
     >
         <img :src="imageUrl" class="w-full h-full">
         <div class="
-            absolute inset-x-0 bottom-0 py-1 flex flex-col place-items-center bg-black/50 backdrop-blur-sm
+            absolute inset-x-0 bottom-0 py-0.5 flex flex-col place-items-center bg-black/50 backdrop-blur-sm
             opacity-0 group-hover:opacity-100 transition-opacity duration-50
         ">
             <div class="flex">
@@ -28,7 +28,7 @@
                     class="w-5 filter brightness-0 invert"
                 >
             </div>
-            <h1 class="text-white text-lg font-bold">{{ title }}</h1>
+            <h1 class="text-white text-lg font-bold -mt-1">{{ title }}</h1>
         </div>
     </div>
 </template>
