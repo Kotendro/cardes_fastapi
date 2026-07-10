@@ -39,7 +39,7 @@ async def get_card_list(page: int = 0, limit: int = 20, db: AsyncSession=Depends
         .options(selectinload(Card.tags))
         .offset(page * limit)
         .limit(limit)
-        .order_by(Card.created_at.desc())
+        .order_by(Card.created_at.asc())
     )
     res = (await db.execute(stmt)).scalars().all()
     
