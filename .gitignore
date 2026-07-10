@@ -9,3 +9,6 @@ node_modules/
 .vscode/
 *.tsbuildinfo
 .DS_store
+
+!/readme_files/
+!/readme_files/*.png
