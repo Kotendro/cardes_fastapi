@@ -1,8 +1,9 @@
 <script setup lang="ts">
     import { computed } from 'vue';
 
+    const currentPage = defineModel<number>({ required: true})
+
     const props = defineProps<{
-        currentPage: number
         totalCards: number
         limit: number
     }>()
@@ -21,10 +22,10 @@
     // Я так горжусь собой за эту реализацию 
     const slice = computed<number>(() => {
         // Сколько элементов должно уйти в другую сторону
-        if (props.currentPage < leftLimit) {
-            return leftLimit-props.currentPage
-        } else if (props.currentPage+rightLimit > lastPage.value) {
-            return -(props.currentPage+rightLimit - lastPage.value)
+        if (currentPage.value < leftLimit) {
+            return leftLimit-currentPage.value
+        } else if (currentPage.value+rightLimit > lastPage.value) {
+            return -(currentPage.value+rightLimit - lastPage.value)
         } else {
             return 0
         }
@@ -32,8 +33,8 @@
 
     const pagePagination = computed<number[]>(() => {
         const res = []
-        let start = Math.max(props.currentPage-leftLimit+slice.value, 0)
-        let end = Math.min(props.currentPage+rightLimit+slice.value, lastPage.value)
+        let start = Math.max(currentPage.value-leftLimit+slice.value, 0)
+        let end = Math.min(currentPage.value+rightLimit+slice.value, lastPage.value)
         for (start; start <= end; start++) {
             res.push(start)
         }
@@ -50,7 +51,7 @@
             v-if="currentPage !== 0" 
             src="/next.svg" alt="next" 
             class="cursor-pointer h-4.5 inline pr-1 -mt-1 opacity-50 hover:opacity-70 -scale-x-100 cursor-pointer"
-            @click="$emit('page-changed', currentPage-1)"
+            @click="currentPage -= 1"
         >
         <button
             v-for="i in pagePagination" :key="i"
@@ -60,7 +61,7 @@
                         ? 'bg-gray-400 text-white font-bold hover:bg-gray-500'
                         : 'hover:bg-gray-200'
                 ]"
-            @click="$emit('page-changed', i)"
+            @click="currentPage = i"
         >
             {{i+1}}
         </button>
@@ -68,7 +69,7 @@
             v-if="currentPage !== lastPage" 
             src="/next.svg" alt="next" 
             class="cursor-pointer h-4.5 inline pr-1 -mt-1 opacity-50 hover:opacity-70"
-            @click="$emit('page-changed', currentPage+1)"
+            @click="currentPage += 1"
         >
     </div>
 </template>

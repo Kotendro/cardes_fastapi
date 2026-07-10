@@ -42,7 +42,6 @@ export async function getCardListRequest(page: number, limit: number) {
 export async function uploadImageRequest(id: string, image: File) {
     const formData = new FormData();
     formData.append('image', image);
-    console.log(id)
     const response = await axios.post(
         `http://127.0.0.1:8000/api/v2/cards/${id}/upload_image`, formData)
     return response

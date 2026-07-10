@@ -5,7 +5,7 @@
     import Pagination from './components/Pagination.vue'
     import { DialogMode, type CardIface } from '@/types.ts'
     import { addCardRequest, deleteCardRequest, getCardListRequest, imageURL, patchCardRequest, preloadImageURL, preloadImageURLs, thumbURL, uploadImageRequest } from './api/api.ts'
-    import { ref, computed, provide, onMounted } from 'vue'
+    import { ref, computed, provide, onMounted, watch } from 'vue'
 
 
     const cards = ref<CardIface[]>([])
@@ -16,6 +16,10 @@
     let isOpen = ref<boolean>(false)
     let dialogMode = ref<DialogMode>(DialogMode.Display)
     const currentCardID = ref<string | null>(null)
+
+    watch(currentPage, () => {
+        getCardList(currentPage.value), { immediate: true }
+    })
 
     const currentCard = computed(() => {
         if (!currentCardID.value) return undefined
@@ -81,7 +85,10 @@
         let serverCard: CardIface | undefined = undefined
         
         try {
-            cards.value.push(newCard)
+            if (cards.value.length != limit) {
+                cards.value.push(newCard)
+            }
+            
             let addResponse = await addCardRequest(newCard)
             if (addResponse.status !== 201) {
                 throw new Error(`ADD card failed with status ${addResponse.status}`)
@@ -96,20 +103,24 @@
             if (imageResponse.status !== 200) {
                 throw new Error(`Upload image failed with status ${imageResponse.status}`);
             }
-            const newBigUrl = imageURL(serverCard, false)
-            const newThumbUrl = thumbURL(serverCard, false)
+            totalCards.value += 1
 
-            const img = new Image()
-            img.onload = () => { cards.value[index]!.image_url = newBigUrl }
-            img.src = newBigUrl
+            if (cards.value.length != limit) {
+                const index = cards.value.findIndex(c => c.id === newCard.id)
+                if (index !== -1) {
+                    Object.assign(cards.value[index]!, serverCard)
 
-            const thumb = new Image()
-            thumb.onload = () => { cards.value[index]!.thumb_url = newThumbUrl }
-            thumb.src = newThumbUrl
+                    const newBigUrl = imageURL(serverCard, false)
+                    const newThumbUrl = thumbURL(serverCard, false)
 
-            const index = cards.value.findIndex(c => c.id === newCard.id)
-            if (index !== -1) {
-                Object.assign(cards.value[index]!, serverCard)
+                    const img = new Image()
+                    img.onload = () => { cards.value[index]!.image_url = newBigUrl }
+                    img.src = newBigUrl
+
+                    const thumb = new Image()
+                    thumb.onload = () => { cards.value[index]!.thumb_url = newThumbUrl }
+                    thumb.src = newThumbUrl
+                }
             }
 
         } catch (err) {
@@ -131,10 +142,25 @@
 
         try {
             cards.value = cards.value.filter(c => c.id !== id)
+
             const deleteResponse = await deleteCardRequest(id)
             if (deleteResponse.status !== 204) {
                 throw new Error(`DELETE card failed with status ${deleteResponse.status}`)
             }
+            totalCards.value -= 1
+            if (cards.value.length === 0 && currentPage.value !== 0) {
+                currentPage.value -= 1
+            }
+
+            if (cards.value.length === limit-1 && totalCards.value>=limit) {
+                const data = await getCardListRequest(1, limit-1)
+                const replacementCard = data.items[0]
+                
+                replacementCard.thumb_url = thumbURL(replacementCard)
+                replacementCard.image_url = imageURL(replacementCard)
+                cards.value.push(replacementCard)
+            }
+
         } catch (err) {
             console.error("deleteCard error:", err)
             cards.value.splice(index, 0, deletedCard)
@@ -201,10 +227,9 @@
             </div>
 
             <Pagination 
-                :currentPage="currentPage"
                 :totalCards="totalCards"
                 :limit="limit"
-                @page-changed="getCardList"
+                v-model="currentPage"
             />
         </div>
     </div>
