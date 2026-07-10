@@ -51,7 +51,7 @@
                 </div>
             </div>
 
-            <div class="flex gap-1 w-80 overflow-auto">
+            <div class="flex gap-1 w-80 flex-wrap verflow-auto">
                 <Tag v-for="(tag, index) in card.tags" :key="index" :tagText="tag"/>
             </div>
 

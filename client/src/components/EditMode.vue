@@ -117,13 +117,13 @@
                 </div>
             </div>
 
-            <div class="flex gap-1 w-80 overflow-auto">
+            <div class="flex gap-1 w-80 flex-wrap overflow-auto">
                 <Tag
                     v-for="(tag, index) in draftCard.tags"
                     :key="index"
                     :tagText="tag"
                     :dialogMode="DialogMode.Edit"
-                    class="cursor-pointer flex-shrink-0"
+                    class="cursor-pointer"
                     @click="deleteTag(tag)"
                 />
                 <input
